@@ -35,6 +35,7 @@ export default function SimulationPathChart({ data, runs, colors, formatCurrency
             color: 'var(--foreground)'
           }}
           formatter={(value: any) => [formatCurrency(value), '']}
+          cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }}
         />
         {runs.map((_, idx) => (
           <Line
@@ -45,6 +46,9 @@ export default function SimulationPathChart({ data, runs, colors, formatCurrency
             stroke={colors[idx % colors.length]}
             strokeWidth={1.5}
             dot={false}
+            isAnimationActive={true}
+            animationDuration={1000}
+            animationEasing="ease-out"
           />
         ))}
       </LineChart>

@@ -18,10 +18,10 @@ export default function GoalChart({ data, fmt, tooltipStyle }: GoalChartProps) {
         <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false}
           tickFormatter={(v) => v >= 1e7 ? `${(v / 1e7).toFixed(0)}Cr` : v >= 1e5 ? `${(v / 1e5).toFixed(0)}L` : `${v / 1000}K`}
         />
-        <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [fmt(v), '']} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [fmt(v), '']} cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }} />
         <Legend wrapperStyle={{ fontSize: 11, color: 'var(--text-muted)' }} />
-        <Bar dataKey="Savings" name="Current Fund"  fill="var(--secondary-custom)" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="Target"  name="Target Amount" fill="var(--primary-custom)"   radius={[4, 4, 0, 0]} />
+        <Bar dataKey="Savings" name="Current Fund"  fill="var(--secondary-custom)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
+        <Bar dataKey="Target"  name="Target Amount" fill="var(--primary-custom)"   radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
       </BarChart>
     </ResponsiveContainer>
   );

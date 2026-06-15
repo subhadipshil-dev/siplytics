@@ -109,16 +109,16 @@ body {
   font-family: 'Inter', sans-serif;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   overflow-x: hidden;
-  transition: background-color 350ms cubic-bezier(0.4, 0, 0.2, 1), color 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 400ms cubic-bezier(0.22, 1, 0.36, 1), color 400ms cubic-bezier(0.22, 1, 0.36, 1);
   line-height: 1.6;
 }
 
 /* Theme transition applied to key layout blocks & wrappers */
 header, aside, main, nav, .glass, .glass-premium, button, input, select, textarea, .card, .metric-card, .badge {
-  transition: background-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 350ms cubic-bezier(0.4, 0, 0.2, 1),
-              color 350ms cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+              color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ─── GLASSMORPHISM ────────────────────────────────────────── */
@@ -342,4 +342,29 @@ select option {
   body { background: #ffffff !important; color: #000000 !important; }
   .no-print { display: none !important; }
   .aurora, .grid-bg { display: none !important; }
+}
+
+/* ─── RECHARTS SVG TRANSITIONS ─────────────────────────────── */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line,
+.recharts-text,
+.recharts-legend-item-text,
+.recharts-curve,
+.recharts-area,
+.recharts-bar-rect,
+.recharts-sector {
+  transition: fill 400ms cubic-bezier(0.22, 1, 0.36, 1),
+              stroke 400ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 400ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* ─── PREFERS REDUCED MOTION ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
 }

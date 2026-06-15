@@ -25,8 +25,9 @@ export default function HeroPreviewChart({ data, fmt }: HeroPreviewChartProps) {
         <Tooltip
           contentStyle={{ background: 'var(--background-secondary)', borderColor: 'var(--card-border)', borderRadius: 10, fontSize: 12, fontFamily: 'Space Grotesk', color: 'var(--foreground)' }}
           formatter={(v: any) => [fmt(v), '']}
+          cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }}
         />
-        <Area type="monotone" dataKey="Wealth" stroke="var(--primary-custom)" strokeWidth={2} fillOpacity={1} fill="url(#heroLandingGrad)" />
+        <Area type="monotone" dataKey="Wealth" stroke="var(--primary-custom)" strokeWidth={2} fillOpacity={1} fill="url(#heroLandingGrad)" isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
       </AreaChart>
     </ResponsiveContainer>
   );

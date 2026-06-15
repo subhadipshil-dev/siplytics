@@ -33,8 +33,9 @@ export default function ReportChart({ data, formatCurrency }: ReportChartProps) 
             color: 'var(--foreground)'
           }}
           formatter={(v: any) => [formatCurrency(v), 'Corpus']}
+          cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }}
         />
-        <Bar dataKey="Corpus" fill="var(--primary-custom)" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="Corpus" fill="var(--primary-custom)" radius={[3, 3, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
       </BarChart>
     </ResponsiveContainer>
   );

@@ -2,12 +2,13 @@
 
 import React, { useState, useMemo } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Button } from '../components/ui';
+import { Card, Button, AnimatedCounter } from '../components/ui';
 import {
   runMonteCarlo,
   getMarketScenarioImpact
 } from '../utils/finance';
 import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
 
 const SimulationPathChart = dynamic(() => import('../components/charts/SimulationPathChart'), { ssr: false });
 const SimulationDistChart = dynamic(() => import('../components/charts/SimulationDistChart'), { ssr: false });
@@ -104,43 +105,55 @@ export const Simulations: React.FC = () => {
         {activeTab === 'montecarlo' ? (
           <>
             {/* Simulation KPI outcomes */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <motion.div
+              key={`mc-stats-${rerunTrigger}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+            >
               <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                 <span className="text-xs text-text-muted">Goal Success Rate</span>
                 <span className="text-lg font-bold font-space text-success-custom mt-1">
-                  {mcResults.successProbability}%
+                  <AnimatedCounter value={mcResults.successProbability} suffix="%" />
                 </span>
               </div>
               <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                 <span className="text-xs text-text-muted">Best Case (90th %)</span>
                 <span className="text-lg font-bold font-space text-white mt-1">
-                  {formatCurrency(mcResults.bestCase)}
+                  <AnimatedCounter value={mcResults.bestCase} formatter={formatCurrency} />
                 </span>
               </div>
               <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                 <span className="text-xs text-text-muted">Median Case (50th %)</span>
                 <span className="text-lg font-bold font-space text-primary-custom mt-1">
-                  {formatCurrency(mcResults.averageCase)}
+                  <AnimatedCounter value={mcResults.averageCase} formatter={formatCurrency} />
                 </span>
               </div>
               <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                 <span className="text-xs text-text-muted">Worst Case (10th %)</span>
                 <span className="text-lg font-bold font-space text-danger-custom mt-1">
-                  {formatCurrency(mcResults.worstCase)}
+                  <AnimatedCounter value={mcResults.worstCase} formatter={formatCurrency} />
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Confidence Interval Alert */}
-            <div className="p-4 rounded-xl bg-primary-custom/5 border border-primary-custom/25 text-xs flex gap-3 items-center text-white">
+            <motion.div
+              key={`mc-ci-${rerunTrigger}`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+              className="p-4 rounded-xl bg-primary-custom/5 border border-primary-custom/25 text-xs flex gap-3 items-center text-white"
+            >
               <ShieldCheck size={18} className="text-primary-custom shrink-0" />
               <div>
                 <span className="font-semibold">95% Confidence Bounds</span>
                 <p className="text-text-muted mt-0.5">
-                  The model is 95% confident your final wealth falls between <span className="font-bold text-white">{formatCurrency(mcResults.confidenceInterval[0])}</span> and <span className="font-bold text-white">{formatCurrency(mcResults.confidenceInterval[1])}</span>.
+                  The model is 95% confident your final wealth falls between <span className="font-bold text-white"><AnimatedCounter value={mcResults.confidenceInterval[0]} formatter={formatCurrency} /></span> and <span className="font-bold text-white"><AnimatedCounter value={mcResults.confidenceInterval[1]} formatter={formatCurrency} /></span>.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
             {/* Multi-Path Sample Line Chart */}
             <Card className="p-6">

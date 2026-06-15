@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, MetricCard, GaugeMeter, ProgressBar, Button } from '../components/ui';
+import { Card, MetricCard, GaugeMeter, ProgressBar, Button, AnimatedCounter } from '../components/ui';
 import {
   TrendingUp, Award, Calendar, Sparkles, ArrowUpRight,
   Milestone as MilestoneIcon, CheckCircle, Clock, Compass,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { calculateFinancialHealthScore, calculateRiskScore, getMilestones } from '../utils/finance';
 import dynamic from 'next/dynamic';
+import { motion } from 'framer-motion';
 
 const DashboardChart = dynamic(() => import('../components/charts/DashboardChart'), { ssr: false });
 
@@ -83,7 +84,7 @@ export const Dashboard: React.FC = () => {
             <div className="absolute flex flex-col items-center justify-center">
               <span className="text-[9px] text-[var(--text-muted)] font-mono uppercase">Profit</span>
               <span className="text-xs font-bold font-space text-[var(--foreground)]">
-                {((sipOutputs.totalReturns / Math.max(1, sipOutputs.finalCorpus)) * 100).toFixed(0)}%
+                <AnimatedCounter value={Math.round((sipOutputs.totalReturns / Math.max(1, sipOutputs.finalCorpus)) * 100)} suffix="%" />
               </span>
             </div>
           </div>
@@ -91,7 +92,9 @@ export const Dashboard: React.FC = () => {
             {pieData.map((d, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <div className="h-2 w-2 rounded-full" style={{ background: d.color }} />
-                <span className="text-[var(--text-muted)]">{d.name} ({((d.value / Math.max(1, sipOutputs.finalCorpus)) * 100).toFixed(0)}%)</span>
+                <span className="text-[var(--text-muted)]">
+                  {d.name} (<AnimatedCounter value={Math.round((d.value / Math.max(1, sipOutputs.finalCorpus)) * 100)} suffix="%" />)
+                </span>
               </div>
             ))}
           </div>
@@ -107,16 +110,16 @@ export const Dashboard: React.FC = () => {
               Financial Independence Progress
             </h4>
             <span className="text-xs text-[var(--primary-custom)] bg-[var(--primary-dim)] px-2 py-0.5 border border-[var(--primary-custom)]/20 rounded-lg font-semibold font-mono">
-              {fireOutputs.currentProgressPercent}%
+              <AnimatedCounter value={fireOutputs.currentProgressPercent} suffix="%" />
             </span>
           </div>
           <p className="text-xs text-[var(--text-muted)] mb-4 leading-relaxed">
-            FIRE target: <strong className="text-[var(--foreground)]">{fmt(fireOutputs.fireNumber)}</strong> — savings rate {fireOutputs.savingsRate}%. Need {fireOutputs.yearsToFire} more years.
+            FIRE target: <strong className="text-[var(--foreground)]"><AnimatedCounter value={fireOutputs.fireNumber} formatter={fmt} /></strong> — savings rate <AnimatedCounter value={fireOutputs.savingsRate} suffix="%" />. Need <AnimatedCounter value={fireOutputs.yearsToFire} /> more years.
           </p>
           <ProgressBar value={fireOutputs.currentProgressPercent} color="primary" />
           <div className="flex justify-between text-[10px] text-[var(--text-subtle)] mt-2">
-            <span>Saved: {fmt(netWorthInputs.assets.cash + netWorthInputs.assets.investments)}</span>
-            <span>Target: {fmt(fireOutputs.fireNumber)}</span>
+            <span>Saved: <AnimatedCounter value={netWorthInputs.assets.cash + netWorthInputs.assets.investments} formatter={fmt} /></span>
+            <span>Target: <AnimatedCounter value={fireOutputs.fireNumber} formatter={fmt} /></span>
           </div>
         </Card>
 
@@ -130,20 +133,28 @@ export const Dashboard: React.FC = () => {
               </span>
             </h4>
             <p className="text-xs text-[var(--text-muted)]">
-              Diversification: <span className="text-[var(--foreground)] font-semibold">{portfolioMetrics.diversificationScore}/100</span>
+              Diversification: <span className="text-[var(--foreground)] font-semibold">
+                <AnimatedCounter value={portfolioMetrics.diversificationScore} />/100
+              </span>
             </p>
           </div>
           <div className="flex flex-col gap-3 border-l border-[var(--card-border)] pl-4">
-            {[
-              { label: 'Volatility',    val: `${portfolioMetrics.expectedVolatility}%`, color: 'var(--foreground)' },
-              { label: 'Diversif.',     val: 'Good',     color: 'var(--success-custom)' },
-              { label: 'Goal Success',  val: `${goalRate}%`, color: 'var(--primary-custom)' },
-            ].map((r, i) => (
-              <div key={i} className="flex justify-between text-xs">
-                <span className="text-[var(--text-muted)]">{r.label}:</span>
-                <span className="font-mono font-bold" style={{ color: r.color }}>{r.val}</span>
-              </div>
-            ))}
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Volatility:</span>
+              <span className="font-mono font-bold text-[var(--foreground)]">
+                <AnimatedCounter value={portfolioMetrics.expectedVolatility} suffix="%" />
+              </span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Diversif.:</span>
+              <span className="font-mono font-bold text-[var(--success-custom)]">Good</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Goal Success:</span>
+              <span className="font-mono font-bold text-[var(--primary-custom)]">
+                <AnimatedCounter value={goalRate} suffix="%" />
+              </span>
+            </div>
           </div>
         </Card>
       </div>
@@ -181,21 +192,45 @@ export const Dashboard: React.FC = () => {
             </h4>
             <span className="text-[10px] text-[var(--text-subtle)] uppercase font-mono tracking-wider">SIP Projections</span>
           </div>
-          <div className="relative border-l-2 border-[var(--card-border)] pl-6 ml-2 flex flex-col gap-4 py-2">
+          <div className="relative pl-6 ml-2 flex flex-col gap-4 py-2">
+            {/* Background line track */}
+            <div className="absolute left-[3px] top-3 bottom-3 w-[2px] bg-[var(--card-border)]" />
+            {/* Achieved progress overlay line */}
+            <div className="absolute left-[3px] top-3 bottom-3 w-[2px]">
+              <motion.div
+                className="w-full bg-gradient-to-b from-[var(--success-custom)] to-[var(--primary-custom)]"
+                initial={{ height: 0 }}
+                animate={{ height: `${(milestones.filter(m => m.achieved).length / Math.max(1, milestones.length)) * 100}%` }}
+                transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </div>
             {milestones.map((m, idx) => {
               const Icon = m.achieved ? CheckCircle : Clock;
               return (
                 <div key={idx} className="relative flex justify-between items-center group">
-                  <div className={`absolute -left-[27px] p-0.5 rounded-full bg-[var(--background)] border transition-colors ${m.achieved ? 'border-[var(--success-custom)]' : 'border-[var(--card-border)]'}`}>
-                    <Icon size={14} className={m.achieved ? 'text-[var(--success-custom)]' : 'text-[var(--text-muted)]'} />
-                  </div>
+                  <motion.div
+                    className="absolute -left-[27px] p-0.5 rounded-full bg-[var(--background)] border z-10"
+                    animate={{
+                      borderColor: m.achieved ? 'var(--success-custom)' : 'var(--card-border)',
+                      scale: m.achieved ? [1, 1.15, 1] : 1,
+                    }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                  >
+                    <Icon size={12} className={m.achieved ? 'text-[var(--success-custom)]' : 'text-[var(--text-muted)]'} />
+                  </motion.div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-[var(--foreground)] group-hover:text-[var(--primary-custom)] transition-colors">{m.label} Milestone</span>
                     <span className="text-[10px] text-[var(--text-subtle)]">{m.achieved ? 'Achieved ✓' : 'Projected'}</span>
                   </div>
                   <div className="text-right">
                     <span className="text-xs font-mono font-semibold text-[var(--foreground)]">{m.estimatedDate}</span>
-                    <p className="text-[10px] text-[var(--text-subtle)]">{m.yearsToReach < 99 ? `${m.yearsToReach} yrs` : 'Beyond horizon'}</p>
+                    <p className="text-[10px] text-[var(--text-subtle)]">
+                      {m.yearsToReach < 99 ? (
+                        <>
+                          <AnimatedCounter value={m.yearsToReach} formatter={(v) => v.toFixed(1)} /> yrs
+                        </>
+                      ) : 'Beyond horizon'}
+                    </p>
                   </div>
                 </div>
               );

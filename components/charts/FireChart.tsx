@@ -44,6 +44,7 @@ export default function FireChart({ data, formatCurrency }: FireChartProps) {
             color: 'var(--foreground)'
           }}
           formatter={(value: any) => [formatCurrency(value), '']}
+          cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }}
         />
         <Legend wrapperStyle={{ fontSize: '11px' }} />
         <Area
@@ -54,6 +55,9 @@ export default function FireChart({ data, formatCurrency }: FireChartProps) {
           strokeWidth={2.5}
           fillOpacity={1}
           fill="url(#colorInvestedCorpus)"
+          isAnimationActive={true}
+          animationDuration={800}
+          animationEasing="ease-out"
         />
         <Area
           type="monotone"
@@ -64,6 +68,9 @@ export default function FireChart({ data, formatCurrency }: FireChartProps) {
           strokeDasharray="4 4"
           fillOpacity={1}
           fill="url(#colorTargetCorpus)"
+          isAnimationActive={true}
+          animationDuration={800}
+          animationEasing="ease-out"
         />
       </AreaChart>
     </ResponsiveContainer>

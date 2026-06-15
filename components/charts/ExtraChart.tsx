@@ -33,11 +33,12 @@ export default function ExtraChart({ data, formatCurrency }: ExtraChartProps) {
             color: 'var(--foreground)'
           }}
           formatter={(v: any) => formatCurrency(v)}
+          cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }}
         />
         <Legend wrapperStyle={{ fontSize: '10px' }} />
-        <Bar dataKey="assets" name="Total Assets" fill="var(--primary-custom)" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="liabilities" name="Liabilities" fill="var(--danger-custom)" radius={[3, 3, 0, 0]} />
-        <Bar dataKey="netWorth" name="Net Worth" fill="var(--secondary-custom)" radius={[3, 3, 0, 0]} />
+        <Bar dataKey="assets" name="Total Assets" fill="var(--primary-custom)" radius={[3, 3, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
+        <Bar dataKey="liabilities" name="Liabilities" fill="var(--danger-custom)" radius={[3, 3, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
+        <Bar dataKey="netWorth" name="Net Worth" fill="var(--secondary-custom)" radius={[3, 3, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
       </BarChart>
     </ResponsiveContainer>
   );

@@ -27,10 +27,10 @@ export default function SipChart({ data, fmt, yAxisFormatter, tooltipStyle }: Si
         <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-line)" vertical={false} />
         <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} />
         <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={yAxisFormatter} />
-        <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [fmt(v), '']} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [fmt(v), '']} cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }} />
         <Legend wrapperStyle={{ fontSize: 11, color: 'var(--text-muted)' }} />
-        <Area type="monotone" name="Total Invested" dataKey="Invested" stroke="var(--secondary-custom)" strokeWidth={2} fillOpacity={1} fill="url(#gInv)" />
-        <Area type="monotone" name="Future Corpus"  dataKey="Corpus"   stroke="var(--primary-custom)"   strokeWidth={2} fillOpacity={1} fill="url(#gWlth)" />
+        <Area type="monotone" name="Total Invested" dataKey="Invested" stroke="var(--secondary-custom)" strokeWidth={2} fillOpacity={1} fill="url(#gInv)" isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
+        <Area type="monotone" name="Future Corpus"  dataKey="Corpus"   stroke="var(--primary-custom)"   strokeWidth={2} fillOpacity={1} fill="url(#gWlth)" isAnimationActive={true} animationDuration={800} animationEasing="ease-out" />
       </AreaChart>
     </ResponsiveContainer>
   );

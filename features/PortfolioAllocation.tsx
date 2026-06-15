@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Slider, Button } from '../components/ui';
+import { Card, Slider, Button, AnimatedCounter } from '../components/ui';
 import dynamic from 'next/dynamic';
 
 const PortfolioChart = dynamic(() => import('../components/charts/PortfolioChart'), { ssr: false });
@@ -86,7 +86,7 @@ export const PortfolioAllocation: React.FC = () => {
                 ? 'bg-success-custom/10 text-success-custom border-success-custom/20' 
                 : 'bg-warning-custom/10 text-warning-custom border-warning-custom/20 animate-pulse'}`}
             >
-              Total: {totalAlloc}%
+              Total: <AnimatedCounter value={totalAlloc} />%
             </span>
           </div>
 
@@ -174,19 +174,19 @@ export const PortfolioAllocation: React.FC = () => {
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
             <span className="text-xs text-text-muted">Expected Return</span>
             <span className="text-lg font-bold font-space text-white mt-1">
-              {portfolioMetrics.expectedReturn}%
+              <AnimatedCounter value={portfolioMetrics.expectedReturn} suffix="%" formatter={(v) => v.toFixed(1)} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
             <span className="text-xs text-text-muted">Volatility Risk</span>
             <span className="text-lg font-bold font-space text-danger-custom mt-1">
-              {portfolioMetrics.expectedVolatility}%
+              <AnimatedCounter value={portfolioMetrics.expectedVolatility} suffix="%" formatter={(v) => v.toFixed(1)} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
             <span className="text-xs text-text-muted">Diversification</span>
             <span className="text-lg font-bold font-space text-success-custom mt-1">
-              {portfolioMetrics.diversificationScore}/100
+              <AnimatedCounter value={portfolioMetrics.diversificationScore} />/100
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
@@ -224,7 +224,9 @@ export const PortfolioAllocation: React.FC = () => {
               {chartData.map((entry, idx) => (
                 <div key={idx} className="flex items-center gap-1">
                   <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                  <span className="truncate">{entry.name}: {entry.value}%</span>
+                  <span className="truncate">
+                    {entry.name}: <AnimatedCounter value={entry.value} suffix="%" />
+                  </span>
                 </div>
               ))}
             </div>
@@ -261,19 +263,19 @@ export const PortfolioAllocation: React.FC = () => {
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div className="flex flex-col gap-1">
-              <span className="font-bold text-white">Equity ({portfolio.equity}%)</span>
+              <span className="font-bold text-white">Equity (<AnimatedCounter value={portfolio.equity} suffix="%" />)</span>
               <p className="text-text-muted leading-relaxed">{allocDescriptions.equity}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <span className="font-bold text-white">Debt ({portfolio.debt}%)</span>
+              <span className="font-bold text-white">Debt (<AnimatedCounter value={portfolio.debt} suffix="%" />)</span>
               <p className="text-text-muted leading-relaxed">{allocDescriptions.debt}</p>
             </div>
             <div className="flex flex-col gap-1 border-t border-card-border/40 sm:border-t-0 sm:pt-0 pt-2">
-              <span className="font-bold text-white">Gold ({portfolio.gold}%)</span>
+              <span className="font-bold text-white">Gold (<AnimatedCounter value={portfolio.gold} suffix="%" />)</span>
               <p className="text-text-muted leading-relaxed">{allocDescriptions.gold}</p>
             </div>
             <div className="flex flex-col gap-1 border-t border-card-border/40 sm:border-t-0 sm:pt-0 pt-2">
-              <span className="font-bold text-white">International Equity ({portfolio.internationalEquity}%)</span>
+              <span className="font-bold text-white">International Equity (<AnimatedCounter value={portfolio.internationalEquity} suffix="%" />)</span>
               <p className="text-text-muted leading-relaxed">{allocDescriptions.internationalEquity}</p>
             </div>
           </div>

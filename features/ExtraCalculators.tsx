@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Slider, Input, Select, Button, ProgressBar } from '../components/ui';
+import { Card, Slider, Input, Select, Button, ProgressBar, AnimatedCounter } from '../components/ui';
 import { Coins, Landmark, ShieldCheck, FileText, ArrowRight, Info, PlusCircle, HelpCircle, Sparkles, TrendingUp } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -185,19 +185,19 @@ export const ExtraCalculators: React.FC = () => {
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase">Net Worth</span>
                   <span className="text-base font-bold font-space text-white mt-1">
-                    {formatCurrency(netWorthOutputs.currentNetWorth)}
+                    <AnimatedCounter value={netWorthOutputs.currentNetWorth} formatter={formatCurrency} />
                   </span>
                 </div>
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase">5 Yr projection</span>
                   <span className="text-base font-bold font-space text-primary-custom mt-1">
-                    {formatCurrency(netWorthOutputs.projectedNetWorth5Years)}
+                    <AnimatedCounter value={netWorthOutputs.projectedNetWorth5Years} formatter={formatCurrency} />
                   </span>
                 </div>
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
                   <span className="text-[10px] text-text-muted uppercase">10 Yr projection</span>
                   <span className="text-base font-bold font-space text-success-custom mt-1">
-                    {formatCurrency(netWorthOutputs.projectedNetWorth10Years)}
+                    <AnimatedCounter value={netWorthOutputs.projectedNetWorth10Years} formatter={formatCurrency} />
                   </span>
                 </div>
               </div>
@@ -255,10 +255,10 @@ export const ExtraCalculators: React.FC = () => {
               <div className="p-5 rounded-2xl glass border border-card-border/80 flex flex-col justify-between items-center text-center">
                 <span className="text-xs text-text-muted font-bold">Recommended Emergency Reserve</span>
                 <span className="text-3xl font-black font-space text-success-custom mt-3">
-                  {formatCurrency(emergencyOutputs.recommendedEmergencyCorpus)}
+                  <AnimatedCounter value={emergencyOutputs.recommendedEmergencyCorpus} formatter={formatCurrency} />
                 </span>
                 <span className="text-xs text-text-muted mt-2 font-mono uppercase">
-                  Coverage: {emergencyOutputs.coverageMonths} Months of Expenses
+                  Coverage: <AnimatedCounter value={emergencyOutputs.coverageMonths} /> Months of Expenses
                 </span>
               </div>
 
@@ -329,13 +329,13 @@ export const ExtraCalculators: React.FC = () => {
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
                   <span className="text-xs text-text-muted">Target Capital Needed</span>
                   <span className="text-base font-bold font-space text-white mt-1">
-                    {formatCurrency(passiveIncomeOutputs.requiredCorpus)}
+                    <AnimatedCounter value={passiveIncomeOutputs.requiredCorpus} formatter={formatCurrency} />
                   </span>
                 </div>
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
                   <span className="text-xs text-text-muted">Est. Timeline</span>
                   <span className="text-base font-bold font-space text-primary-custom mt-1">
-                    {passiveIncomeOutputs.timelineYears} Years
+                    <AnimatedCounter value={passiveIncomeOutputs.timelineYears} /> Years
                   </span>
                 </div>
               </div>
@@ -344,10 +344,10 @@ export const ExtraCalculators: React.FC = () => {
                 <div>
                   <h4 className="text-sm font-semibold text-text-muted mb-2">Compounding Recommendations</h4>
                   <p className="text-xs text-text-muted mt-3 leading-relaxed">
-                    To withdraw <span className="font-semibold text-white">{formatCurrency(passiveIncomeInputs.desiredMonthlyIncome)}/month</span> safely, you must build a capital base of <span className="font-semibold text-white">{formatCurrency(passiveIncomeOutputs.requiredCorpus)}</span>. 
+                    To withdraw <span className="font-semibold text-white"><AnimatedCounter value={passiveIncomeInputs.desiredMonthlyIncome} formatter={formatCurrency} />/month</span> safely, you must build a capital base of <span className="font-semibold text-white"><AnimatedCounter value={passiveIncomeOutputs.requiredCorpus} formatter={formatCurrency} /></span>. 
                   </p>
                   <p className="text-xs text-text-muted mt-2 leading-relaxed">
-                    Assuming you save ₹20,000 monthly in a portfolio compounding at {passiveIncomeInputs.expectedReturn}%, you could reach this financial freedom target in approximately {passiveIncomeOutputs.timelineYears} years.
+                    Assuming you save ₹20,000 monthly in a portfolio compounding at {passiveIncomeInputs.expectedReturn}%, you could reach this financial freedom target in approximately <AnimatedCounter value={passiveIncomeOutputs.timelineYears} /> years.
                   </p>
                 </div>
 
@@ -403,19 +403,19 @@ export const ExtraCalculators: React.FC = () => {
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
                   <span className="text-[10px] text-text-muted uppercase">Est. Tax</span>
                   <span className="text-base font-bold font-space text-white mt-1">
-                    {formatCurrency(taxOutputs.capitalGainsTax)}
+                    <AnimatedCounter value={taxOutputs.capitalGainsTax} formatter={formatCurrency} />
                   </span>
                 </div>
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
                   <span className="text-[10px] text-text-muted uppercase">With Cess (4%)</span>
                   <span className="text-base font-bold font-space text-danger-custom mt-1">
-                    {formatCurrency(taxOutputs.withdrawalTaxImpact)}
+                    <AnimatedCounter value={taxOutputs.withdrawalTaxImpact} formatter={formatCurrency} />
                   </span>
                 </div>
                 <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col justify-between">
                   <span className="text-[10px] text-text-muted uppercase">Efficiency</span>
                   <span className="text-base font-bold font-space text-success-custom mt-1">
-                    {taxOutputs.taxEfficiencyScore}/100
+                    <AnimatedCounter value={taxOutputs.taxEfficiencyScore} />/100
                   </span>
                 </div>
               </div>

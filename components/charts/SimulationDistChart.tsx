@@ -22,8 +22,9 @@ export default function SimulationDistChart({ data }: SimulationDistChartProps) 
             fontSize: '11px',
             color: 'var(--foreground)'
           }}
+          cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
         />
-        <Bar dataKey="count" name="Frequency (Number of Runs)" fill="url(#colorMCBar)" radius={[4, 4, 0, 0]}>
+        <Bar dataKey="count" name="Frequency (Number of Runs)" fill="url(#colorMCBar)" radius={[4, 4, 0, 0]} isAnimationActive={true} animationDuration={800} animationEasing="ease-out">
           <defs>
             <linearGradient id="colorMCBar" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--primary-custom)" stopOpacity={0.8} />

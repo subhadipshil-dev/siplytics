@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Slider, Input, Select, Button } from '../components/ui';
+import { Card, Slider, Input, Select, Button, AnimatedCounter } from '../components/ui';
 import { calculateSip } from '../utils/finance';
 import { Layers } from 'lucide-react';
+import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 
 const SipChart = dynamic(() => import('../components/charts/SipChart'), { ssr: false });
@@ -84,14 +85,16 @@ export const SipCalculator: React.FC = () => {
         {/* KPI Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'Total Invested', val: fmt(sipOutputs.totalInvested),           color: 'var(--secondary-custom)' },
-            { label: 'Est. Returns',   val: fmt(sipOutputs.totalReturns),             color: 'var(--success-custom)' },
-            { label: 'Future Corpus',  val: fmt(sipOutputs.finalCorpus),              color: 'var(--primary-custom)' },
-            { label: 'Real Corpus',    val: fmt(sipOutputs.realCorpus),               color: 'var(--warning-custom)' },
+            { label: 'Total Invested', val: sipOutputs.totalInvested,           color: 'var(--secondary-custom)' },
+            { label: 'Est. Returns',   val: sipOutputs.totalReturns,            color: 'var(--success-custom)' },
+            { label: 'Future Corpus',  val: sipOutputs.finalCorpus,             color: 'var(--primary-custom)' },
+            { label: 'Real Corpus',    val: sipOutputs.realCorpus,              color: 'var(--warning-custom)' },
           ].map((k, i) => (
             <div key={i} className="glass-premium rounded-2xl p-4 flex flex-col gap-0.5">
               <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide font-medium">{k.label}</span>
-              <span className="text-base font-bold font-space mt-0.5" style={{ color: k.color }}>{k.val}</span>
+              <span className="text-base font-bold font-space mt-0.5" style={{ color: k.color }}>
+                <AnimatedCounter value={k.val} formatter={fmt} />
+              </span>
             </div>
           ))}
         </div>
@@ -165,8 +168,13 @@ export const SipCalculator: React.FC = () => {
                       <span className="font-semibold text-[var(--foreground)]">{sc.label}</span>
                       <span className="font-mono text-[var(--primary-custom)] font-bold">{fmt(sc.finalCorpus)}</span>
                     </div>
-                    <div className="w-full bg-[var(--input-border)] h-1.5 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-[var(--primary-custom)] to-[var(--secondary-custom)] rounded-full transition-all duration-700" style={{ width: `${barWidth}%` }} />
+                    <div className="w-full bg-[var(--input-border)] h-1.5 rounded-full overflow-hidden relative">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-[var(--primary-custom)] to-[var(--secondary-custom)] rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${barWidth}%` }}
+                        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                      />
                     </div>
                     <div className="flex justify-between text-[10px] text-[var(--text-subtle)]">
                       <span>Invested: {fmt(sc.invested)}</span>
@@ -180,16 +188,24 @@ export const SipCalculator: React.FC = () => {
 
           {/* Score footer */}
           <div className="grid grid-cols-3 gap-4 border-t border-[var(--card-border)] pt-4 mt-5 text-center">
-            {[
-              { label: 'Compounding Power', val: `${sipOutputs.compoundingScore}/100`,         color: 'var(--foreground)' },
-              { label: 'Efficiency Score',  val: `${sipOutputs.investmentEfficiencyScore}/100`, color: 'var(--success-custom)' },
-              { label: 'Wealth Multiplier', val: `${sipOutputs.wealthMultiplier}×`,             color: 'var(--primary-custom)' },
-            ].map((s, i) => (
-              <div key={i} className="flex flex-col">
-                <span className="text-[9px] text-[var(--text-subtle)] uppercase font-semibold tracking-wide">{s.label}</span>
-                <span className="text-sm font-bold mt-0.5" style={{ color: s.color }}>{s.val}</span>
-              </div>
-            ))}
+            <div className="flex flex-col">
+              <span className="text-[9px] text-[var(--text-subtle)] uppercase font-semibold tracking-wide">Compounding Power</span>
+              <span className="text-sm font-bold mt-0.5 text-[var(--foreground)]">
+                <AnimatedCounter value={sipOutputs.compoundingScore} />/100
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[9px] text-[var(--text-subtle)] uppercase font-semibold tracking-wide">Efficiency Score</span>
+              <span className="text-sm font-bold mt-0.5 text-[var(--success-custom)]">
+                <AnimatedCounter value={sipOutputs.investmentEfficiencyScore} />/100
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[9px] text-[var(--text-subtle)] uppercase font-semibold tracking-wide">Wealth Multiplier</span>
+              <span className="text-sm font-bold mt-0.5 text-[var(--primary-custom)]">
+                <AnimatedCounter value={sipOutputs.wealthMultiplier} formatter={(v) => v.toFixed(1)} />×
+              </span>
+            </div>
           </div>
         </Card>
       </div>

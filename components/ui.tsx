@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, animate, useMotionValue } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 
 /* ─── Card ─────────────────────────────────────────────────── */
@@ -41,31 +41,34 @@ export const AnimatedCounter: React.FC<{
   prefix?: string;
   suffix?: string;
   duration?: number;
-}> = ({ value, prefix = '', suffix = '', duration = 1.5 }) => {
-  const [count, setCount] = useState(0);
+  formatter?: (n: number) => string;
+}> = ({ value, prefix = '', suffix = '', duration = 1.0, formatter }) => {
+  const motionValue = useMotionValue(value);
+  const [displayValue, setDisplayValue] = useState(value);
 
   useEffect(() => {
-    let start = 0;
-    if (start === value) { setCount(value); return; }
-    const steps = (duration * 1000) / 30;
-    const inc = (value - start) / steps;
-    const timer = setInterval(() => {
-      start += inc;
-      if (start >= value) { clearInterval(timer); setCount(value); }
-      else setCount(Math.round(start));
-    }, 30);
-    return () => clearInterval(timer);
-  }, [value, duration]);
+    const controls = animate(motionValue, value, {
+      duration: duration,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (latest) => {
+        setDisplayValue(latest);
+      },
+    });
+    return () => controls.stop();
+  }, [value, duration, motionValue]);
 
-  const fmt = (n: number) => {
-    if (n >= 10_000_000) return `${(n / 10_000_000).toFixed(2)} Cr`;
-    if (n >= 100_000)    return `${(n / 100_000).toFixed(2)} L`;
-    return n.toLocaleString('en-IN');
+  const defaultFmt = (n: number) => {
+    const rounded = Math.round(n);
+    if (rounded >= 10_000_000) return `${(n / 10_000_000).toFixed(2)} Cr`;
+    if (rounded >= 100_000)    return `${(n / 100_000).toFixed(2)} L`;
+    return rounded.toLocaleString('en-IN');
   };
+
+  const formattedValue = formatter ? formatter(displayValue) : defaultFmt(displayValue);
 
   return (
     <span>
-      {prefix}{value >= 100_000 ? fmt(count) : count.toLocaleString('en-IN')}{suffix}
+      {prefix}{formattedValue}{suffix}
     </span>
   );
 };
@@ -350,10 +353,12 @@ export const GaugeMeter: React.FC<GaugeMeterProps> = ({
           <path d="M 10 60 A 50 50 0 0 1 110 60" fill="none"
             stroke={strokeColors[color]} strokeWidth={strokeWidth} strokeLinecap="round"
             strokeDasharray={circumference} strokeDashoffset={offset}
-            style={{ transition: 'stroke-dashoffset 1s ease' }} />
+            style={{ transition: 'stroke-dashoffset 1000ms cubic-bezier(0.22, 1, 0.36, 1)' }} />
         </svg>
         <div className="absolute bottom-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-black font-space text-[var(--foreground)]">{value}</span>
+          <span className="text-3xl font-black font-space text-[var(--foreground)]">
+            <AnimatedCounter value={value} />
+          </span>
         </div>
       </div>
       {subtitle && (
@@ -390,7 +395,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         className={`h-full rounded-full bg-gradient-to-r ${gradients[color]}`}
         initial={{ width: 0 }}
         animate={{ width: `${normalized}%` }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       />
     </div>
   );

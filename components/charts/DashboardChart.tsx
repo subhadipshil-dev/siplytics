@@ -16,7 +16,7 @@ export default function DashboardChart({ data, fmt }: DashboardChartProps) {
           contentStyle={{ background: 'var(--background-secondary)', borderColor: 'var(--card-border)', borderRadius: 8, fontSize: 11, color: 'var(--foreground)' }}
           formatter={(v: any) => [fmt(v), '']}
         />
-        <Pie data={data} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={4} dataKey="value">
+        <Pie data={data} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={4} dataKey="value" isAnimationActive={true} animationDuration={800} animationEasing="ease-out">
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}

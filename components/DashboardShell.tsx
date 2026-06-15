@@ -35,7 +35,7 @@ const ThemeToggle: React.FC<{
   theme: 'dark' | 'light' | 'system';
   setTheme: (t: 'dark' | 'light' | 'system') => void;
 }> = ({ theme, setTheme }) => (
-  <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--card-border)]">
+  <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--card-border)] relative">
     {[
       { mode: 'dark' as const,   icon: Moon,    label: 'Dark' },
       { mode: 'light' as const,  icon: Sun,     label: 'Light' },
@@ -45,13 +45,20 @@ const ThemeToggle: React.FC<{
         key={mode}
         onClick={() => setTheme(mode)}
         title={`${label} theme`}
-        className={`p-1.5 rounded-lg transition-all duration-200 ${
+        className={`p-1.5 rounded-lg transition-all duration-200 relative z-10 cursor-pointer ${
           theme === mode
-            ? 'bg-[var(--primary-custom)] text-black'
+            ? 'text-black font-semibold'
             : 'text-[var(--text-muted)] hover:text-[var(--foreground)]'
         }`}
       >
         <Icon size={12} />
+        {theme === mode && (
+          <motion.div
+            layoutId="sidebar-active-theme-bg"
+            className="absolute inset-0 bg-[var(--primary-custom)] rounded-lg -z-10"
+            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          />
+        )}
       </button>
     ))}
   </div>

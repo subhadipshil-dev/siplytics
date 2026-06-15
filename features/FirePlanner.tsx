@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Slider, Input, Select, Button, ProgressBar } from '../components/ui';
+import { Card, Slider, Input, Select, Button, ProgressBar, AnimatedCounter } from '../components/ui';
 import { Flame, ShieldAlert, Award, Landmark, Info, Calendar, Sparkles, TrendingUp } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -141,7 +141,9 @@ export const FirePlanner: React.FC = () => {
           <div className="flex gap-3 items-start text-xs leading-relaxed text-text-muted">
             <ShieldAlert size={16} className="text-red-500 shrink-0 mt-0.5" />
             <div className="flex flex-col gap-1 text-white">
-              <span className="font-semibold text-white">FIRE Savings Rate: {fireOutputs.savingsRate}%</span>
+              <span className="font-semibold text-white">
+                FIRE Savings Rate: <AnimatedCounter value={fireOutputs.savingsRate} suffix="%" />
+              </span>
               <span>
                 {fireOutputs.savingsRate >= 50
                   ? 'Excellent savings rate! Saving over half your income dramatically accelerates your timeline by compounding assets far quicker than standard retirement models.'
@@ -160,25 +162,33 @@ export const FirePlanner: React.FC = () => {
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">FIRE Target (Today)</span>
             <span className="text-lg font-bold font-space text-white mt-1">
-              {formatCurrency(fireOutputs.fireNumber)}
+              <AnimatedCounter value={fireOutputs.fireNumber} formatter={formatCurrency} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Required Future Corpus</span>
             <span className="text-lg font-bold font-space text-primary-custom mt-1">
-              {formatCurrency(fireOutputs.requiredCorpus)}
+              <AnimatedCounter value={fireOutputs.requiredCorpus} formatter={formatCurrency} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Years to FIRE</span>
             <span className="text-lg font-bold font-space text-success-custom mt-1">
-              {fireOutputs.yearsToFire < 50 ? `${fireOutputs.yearsToFire} Years` : '50+ Years'}
+              {fireOutputs.yearsToFire < 50 ? (
+                <>
+                  <AnimatedCounter value={fireOutputs.yearsToFire} /> Years
+                </>
+              ) : '50+ Years'}
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Target Age</span>
             <span className="text-lg font-bold font-space text-warning-custom mt-1">
-              {fireOutputs.yearsToFire < 50 ? `Age ${fireOutputs.targetAge}` : 'Beyond 80'}
+              {fireOutputs.yearsToFire < 50 ? (
+                <>
+                  Age <AnimatedCounter value={fireOutputs.targetAge} />
+                </>
+              ) : 'Beyond 80'}
             </span>
           </div>
         </div>
@@ -218,7 +228,7 @@ export const FirePlanner: React.FC = () => {
           {activeTab === 'milestones' && (
             <div className="flex flex-col gap-4">
               <p className="text-xs text-text-muted leading-relaxed">
-                Reaching financial independence occurs in distinct stages. Check your progress towards each tier based on your current savings of <span className="font-semibold text-white">{formatCurrency(currentInvestments)}</span>:
+                Reaching financial independence occurs in distinct stages. Check your progress towards each tier based on your current savings of <span className="font-semibold text-white"><AnimatedCounter value={currentInvestments} formatter={formatCurrency} /></span>:
               </p>
 
               <div className="flex flex-col gap-3">
@@ -231,11 +241,13 @@ export const FirePlanner: React.FC = () => {
                       <span className="text-[10px] text-text-muted">For a minimalist lifestyle</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-primary-custom font-bold">{formatCurrency(leanFireTarget)}</span>
+                      <span className="font-mono text-primary-custom font-bold"><AnimatedCounter value={leanFireTarget} formatter={formatCurrency} /></span>
                       <p className="text-[10px] text-text-muted">
                         {currentInvestments >= leanFireTarget 
                           ? <span className="text-success-custom font-semibold">✓ Achieved!</span> 
-                          : `${Math.round((currentInvestments / leanFireTarget) * 100)}% complete`}
+                          : <>
+                              <AnimatedCounter value={Math.min(100, Math.round((currentInvestments / leanFireTarget) * 100))} suffix="% complete" />
+                            </>}
                       </p>
                     </div>
                   </div>
@@ -252,11 +264,13 @@ export const FirePlanner: React.FC = () => {
                       <span className="text-[10px] text-text-muted">Your specified safety target</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-secondary-custom font-bold">{formatCurrency(standardFireTarget)}</span>
+                      <span className="font-mono text-secondary-custom font-bold"><AnimatedCounter value={standardFireTarget} formatter={formatCurrency} /></span>
                       <p className="text-[10px] text-text-muted">
                         {currentInvestments >= standardFireTarget 
                           ? <span className="text-success-custom font-semibold">✓ Achieved!</span> 
-                          : `${Math.round((currentInvestments / standardFireTarget) * 100)}% complete`}
+                          : <>
+                              <AnimatedCounter value={Math.min(100, Math.round((currentInvestments / standardFireTarget) * 100))} suffix="% complete" />
+                            </>}
                       </p>
                     </div>
                   </div>
@@ -273,11 +287,13 @@ export const FirePlanner: React.FC = () => {
                       <span className="text-[10px] text-text-muted">For an abundant / luxury retirement</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-warning-custom font-bold">{formatCurrency(fatFireTarget)}</span>
+                      <span className="font-mono text-warning-custom font-bold"><AnimatedCounter value={fatFireTarget} formatter={formatCurrency} /></span>
                       <p className="text-[10px] text-text-muted">
                         {currentInvestments >= fatFireTarget 
                           ? <span className="text-success-custom font-semibold">✓ Achieved!</span> 
-                          : `${Math.round((currentInvestments / fatFireTarget) * 100)}% complete`}
+                          : <>
+                              <AnimatedCounter value={Math.min(100, Math.round((currentInvestments / fatFireTarget) * 100))} suffix="% complete" />
+                            </>}
                       </p>
                     </div>
                   </div>
@@ -294,11 +310,13 @@ export const FirePlanner: React.FC = () => {
                       <span className="text-[10px] text-text-muted">Grow standard FIRE target passively by Age 60</span>
                     </div>
                     <div className="text-right">
-                      <span className="font-mono text-white font-bold">{formatCurrency(coastFireTarget)}</span>
+                      <span className="font-mono text-white font-bold"><AnimatedCounter value={coastFireTarget} formatter={formatCurrency} /></span>
                       <p className="text-[10px] text-text-muted">
                         {currentInvestments >= coastFireTarget 
                           ? <span className="text-success-custom font-semibold">✓ Achieved!</span> 
-                          : `${Math.round((currentInvestments / coastFireTarget) * 100)}% complete`}
+                          : <>
+                              <AnimatedCounter value={Math.min(100, Math.round((currentInvestments / coastFireTarget) * 100))} suffix="% complete" />
+                            </>}
                       </p>
                     </div>
                   </div>

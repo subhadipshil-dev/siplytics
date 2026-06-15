@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Button, GaugeMeter, ProgressBar } from '../components/ui';
+import { Card, Button, GaugeMeter, ProgressBar, AnimatedCounter } from '../components/ui';
 import { ShieldCheck, ArrowRight, HelpCircle, Check, Award, RefreshCw, Scale } from 'lucide-react';
 import { RiskProfile } from '../types';
 
@@ -225,7 +225,7 @@ export const RiskAnalysis: React.FC = () => {
               <span className="text-xs text-text-muted uppercase font-semibold">Active Profile Setting</span>
               <h4 className="text-2xl font-bold font-space text-white mt-1 capitalize">{currentProfile} Profile</h4>
               <p className="text-xs text-text-muted mt-2 leading-relaxed">
-                Your portfolio currently carries an estimated expected volatility of <span className="font-semibold text-white">{portfolioMetrics.expectedVolatility}%</span> with an expected return of <span className="font-semibold text-white">{portfolioMetrics.expectedReturn}%</span>.
+                Your portfolio currently carries an estimated expected volatility of <span className="font-semibold text-white"><AnimatedCounter value={portfolioMetrics.expectedVolatility} suffix="%" /></span> with an expected return of <span className="font-semibold text-white"><AnimatedCounter value={portfolioMetrics.expectedReturn} suffix="%" /></span>.
               </p>
             </div>
             
@@ -251,11 +251,15 @@ export const RiskAnalysis: React.FC = () => {
             <div className="flex flex-col gap-2.5">
               <div className="flex justify-between items-center bg-white/[0.01] p-3 rounded-lg border border-card-border">
                 <span className="font-semibold text-white">Current Stock Weight:</span>
-                <span className="font-mono text-white font-bold">{portfolio.equity + portfolio.internationalEquity}%</span>
+                <span className="font-mono text-white font-bold">
+                  <AnimatedCounter value={portfolio.equity + portfolio.internationalEquity} suffix="%" />
+                </span>
               </div>
               <div className="flex justify-between items-center bg-white/[0.01] p-3 rounded-lg border border-card-border">
                 <span className="font-semibold text-white">Current Debt & Cash Weight:</span>
-                <span className="font-mono text-white font-bold">{portfolio.debt + portfolio.cash}%</span>
+                <span className="font-mono text-white font-bold">
+                  <AnimatedCounter value={portfolio.debt + portfolio.cash} suffix="%" />
+                </span>
               </div>
             </div>
 

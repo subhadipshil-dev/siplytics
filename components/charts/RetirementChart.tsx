@@ -40,6 +40,7 @@ export default function RetirementChart({ data, formatCurrency }: RetirementChar
             color: 'var(--foreground)'
           }}
           formatter={(value: any) => [formatCurrency(value), '']}
+          cursor={{ stroke: 'var(--primary-custom)', strokeWidth: 1, strokeDasharray: '4 4' }}
         />
         <Area
           type="monotone"
@@ -49,6 +50,9 @@ export default function RetirementChart({ data, formatCurrency }: RetirementChar
           strokeWidth={2.5}
           fillOpacity={1}
           fill="url(#colorCorpus)"
+          isAnimationActive={true}
+          animationDuration={800}
+          animationEasing="ease-out"
         />
       </AreaChart>
     </ResponsiveContainer>

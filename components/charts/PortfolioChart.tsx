@@ -30,6 +30,9 @@ export default function PortfolioChart({ data, colors }: PortfolioChartProps) {
           outerRadius={65}
           paddingAngle={3}
           dataKey="value"
+          isAnimationActive={true}
+          animationDuration={800}
+          animationEasing="ease-out"
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />

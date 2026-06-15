@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Input, Button } from '../components/ui';
+import { Card, Input, Button, AnimatedCounter } from '../components/ui';
 import { calculatePortfolioMetrics } from '../utils/finance';
 import dynamic from 'next/dynamic';
 
@@ -302,19 +302,19 @@ export const Reports: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 border border-card-border rounded-xl bg-white/[0.01] flex justify-between items-center text-xs">
                 <span className="text-text-muted">Total Principal Invested:</span>
-                <span className="font-mono text-white font-bold">{formatCurrency(sipOutputs.totalInvested)}</span>
+                <span className="font-mono text-white font-bold"><AnimatedCounter value={sipOutputs.totalInvested} formatter={formatCurrency} /></span>
               </div>
               <div className="p-3 border border-card-border rounded-xl bg-white/[0.01] flex justify-between items-center text-xs">
                 <span className="text-text-muted">Estimated Returns Earned:</span>
-                <span className="font-mono text-success-custom font-bold">{formatCurrency(sipOutputs.totalReturns)}</span>
+                <span className="font-mono text-success-custom font-bold"><AnimatedCounter value={sipOutputs.totalReturns} formatter={formatCurrency} /></span>
               </div>
               <div className="p-3 border border-card-border rounded-xl bg-white/[0.01] flex justify-between items-center text-xs">
                 <span className="text-text-muted">Projected Future Wealth:</span>
-                <span className="font-mono text-primary-custom font-bold">{formatCurrency(sipOutputs.finalCorpus)}</span>
+                <span className="font-mono text-primary-custom font-bold"><AnimatedCounter value={sipOutputs.finalCorpus} formatter={formatCurrency} /></span>
               </div>
               <div className="p-3 border border-card-border rounded-xl bg-white/[0.01] flex justify-between items-center text-xs">
                 <span className="text-text-muted">Inflation-Adjusted Corpus:</span>
-                <span className="font-mono text-warning-custom font-bold">{formatCurrency(sipOutputs.inflationAdjustedCorpus)}</span>
+                <span className="font-mono text-warning-custom font-bold"><AnimatedCounter value={sipOutputs.inflationAdjustedCorpus} formatter={formatCurrency} /></span>
               </div>
             </div>
           </div>
@@ -349,15 +349,15 @@ export const Reports: React.FC = () => {
             <div className="p-4 border border-card-border rounded-xl bg-white/[0.01] flex flex-col gap-2.5 text-xs text-text-muted">
               <div className="flex justify-between items-center">
                 <span>Required Corpus target:</span>
-                <span className="font-bold text-white font-mono">{formatCurrency(retirementOutputs.requiredRetirementCorpus)}</span>
+                <span className="font-bold text-white font-mono"><AnimatedCounter value={retirementOutputs.requiredRetirementCorpus} formatter={formatCurrency} /></span>
               </div>
               <div className="flex justify-between items-center border-t border-card-border/40 pt-2">
                 <span>Projected wealth corpus:</span>
-                <span className="font-bold text-white font-mono">{formatCurrency(retirementOutputs.projectedCorpusAtRetirement)}</span>
+                <span className="font-bold text-white font-mono"><AnimatedCounter value={retirementOutputs.projectedCorpusAtRetirement} formatter={formatCurrency} /></span>
               </div>
               <div className="flex justify-between items-center border-t border-card-border/40 pt-2">
                 <span>Security / Readiness Score:</span>
-                <span className="font-bold text-success-custom font-mono">{retirementOutputs.retirementReadinessScore}%</span>
+                <span className="font-bold text-success-custom font-mono"><AnimatedCounter value={retirementOutputs.retirementReadinessScore} suffix="%" /></span>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Input, Select, Button, Slider, ProgressBar } from '../components/ui';
+import { Card, Input, Select, Button, Slider, ProgressBar, AnimatedCounter } from '../components/ui';
 import { GoalType } from '../types';
 import { Target, Plus, Trash2, AlertCircle, Home, Car, Heart, GraduationCap, Landmark, Plane, Flame } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -100,13 +100,15 @@ export const GoalPlanner: React.FC = () => {
         {goals.length > 0 && (
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'Combined Target',  val: fmt(totalTarget),  color: 'var(--foreground)' },
-              { label: 'Current Funds',    val: fmt(totalSavings), color: 'var(--success-custom)' },
-              { label: 'Capital Gap',      val: fmt(totalGap),     color: 'var(--warning-custom)' },
+              { label: 'Combined Target',  val: totalTarget,  color: 'var(--foreground)' },
+              { label: 'Current Funds',    val: totalSavings, color: 'var(--success-custom)' },
+              { label: 'Capital Gap',      val: totalGap,     color: 'var(--warning-custom)' },
             ].map((k, i) => (
               <div key={i} className="glass-premium rounded-2xl p-4">
                 <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide font-medium block mb-1">{k.label}</span>
-                <span className="text-base font-bold font-space" style={{ color: k.color }}>{k.val}</span>
+                <span className="text-base font-bold font-space" style={{ color: k.color }}>
+                  <AnimatedCounter value={k.val} formatter={fmt} />
+                </span>
               </div>
             ))}
           </div>
@@ -116,7 +118,7 @@ export const GoalPlanner: React.FC = () => {
         <div className="flex justify-between items-center px-1">
           <h3 className="font-space font-bold text-base text-[var(--foreground)]">Your Goals ({goals.length})</h3>
           {goals.length > 0 && (
-            <span className="text-xs text-[var(--text-muted)]">Overall: <strong className="text-[var(--foreground)]">{overallPct}%</strong> funded</span>
+            <span className="text-xs text-[var(--text-muted)]">Overall: <strong className="text-[var(--foreground)]"><AnimatedCounter value={overallPct} suffix="%" /></strong> funded</span>
           )}
         </div>
 
@@ -151,8 +153,8 @@ export const GoalPlanner: React.FC = () => {
                       <div className="flex flex-col gap-1">
                         <ProgressBar value={goal.progressPercent} color="primary" />
                         <div className="flex justify-between text-[10px] text-[var(--text-subtle)]">
-                          <span>Saved: {fmt(goal.currentSavings)}</span>
-                          <span>Target: {fmt(goal.targetAmount)}</span>
+                          <span>Saved: <AnimatedCounter value={goal.currentSavings} formatter={fmt} /></span>
+                          <span>Target: <AnimatedCounter value={goal.targetAmount} formatter={fmt} /></span>
                         </div>
                       </div>
                     </div>
@@ -160,17 +162,31 @@ export const GoalPlanner: React.FC = () => {
 
                   {/* Right section */}
                   <div className="sm:border-l border-[var(--card-border)] sm:pl-5 shrink-0 flex flex-col justify-between gap-3 min-w-[168px]">
-                    <div className="flex flex-col gap-1.5">
-                      {[
-                        { label: 'Required SIP:',  val: goal.requiredSip > 0 ? `₹${goal.requiredSip.toLocaleString('en-IN')}/mo` : 'Achieved!', color: 'var(--primary-custom)' },
-                        { label: 'Or Lumpsum:',    val: goal.requiredLumpsum > 0 ? fmt(goal.requiredLumpsum) : 'Achieved!',                        color: 'var(--foreground)' },
-                        { label: 'Probability:',   val: `${goal.achievementProbability}%`,                                                         color: 'var(--success-custom)' },
-                      ].map((r, i) => (
-                        <div key={i} className="flex justify-between items-center text-xs">
-                          <span className="text-[var(--text-muted)]">{r.label}</span>
-                          <span className="font-mono font-bold" style={{ color: r.color }}>{r.val}</span>
-                        </div>
-                      ))}
+                    <div className="flex flex-col gap-1.5 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[var(--text-muted)]">Required SIP:</span>
+                        <span className="font-mono font-bold text-[var(--primary-custom)]">
+                          {goal.requiredSip > 0 ? (
+                            <>
+                              ₹<AnimatedCounter value={goal.requiredSip} />/mo
+                            </>
+                          ) : 'Achieved!'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[var(--text-muted)]">Or Lumpsum:</span>
+                        <span className="font-mono font-bold text-[var(--foreground)]">
+                          {goal.requiredLumpsum > 0 ? (
+                            <AnimatedCounter value={goal.requiredLumpsum} formatter={fmt} />
+                          ) : 'Achieved!'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[var(--text-muted)]">Probability:</span>
+                        <span className="font-mono font-bold text-[var(--success-custom)]">
+                          <AnimatedCounter value={goal.achievementProbability} suffix="%" />
+                        </span>
+                      </div>
                     </div>
                     <Button variant="ghost" size="sm" className="text-[var(--danger-custom)] hover:bg-[var(--danger-dim)] self-start" onClick={() => deleteGoal(goal.id)}>
                       <Trash2 size={13} /> Remove

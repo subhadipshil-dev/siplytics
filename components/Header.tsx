@@ -1,12 +1,12 @@
-'use client';
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { Button } from './ui';
-import { Sun, Moon, Monitor, TrendingUp } from 'lucide-react';
+import { Sun, Moon, Monitor } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const { theme, setTheme, setActiveTab } = useFinanceStore();
+  const [activeSection, setActiveSection] = useState<string>('');
 
   const navLinks = [
     { label: 'Why SIPlytics', href: '#why-siplytics' },
@@ -15,6 +15,33 @@ export const Header: React.FC = () => {
     { label: 'Interactive Calc', href: '#interactive-calculator' },
     { label: 'Methodology', href: '#methodology' },
   ];
+
+  useEffect(() => {
+    const sections = navLinks.map(link => document.querySelector(link.href));
+    const observerOptions = {
+      root: null,
+      rootMargin: '-40% 0px -40% 0px',
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.target.id) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((sec) => {
+      if (sec) observer.observe(sec);
+    });
+
+    return () => {
+      sections.forEach((sec) => {
+        if (sec) observer.unobserve(sec);
+      });
+    };
+  }, []);
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
@@ -47,22 +74,35 @@ export const Header: React.FC = () => {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={(e) => handleScroll(e, link.href)}
-              className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors duration-200"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const sectionId = link.href.substring(1);
+            const isActive = activeSection === sectionId;
+            return (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(e) => handleScroll(e, link.href)}
+                className={`text-xs font-semibold relative py-1 transition-colors duration-200 cursor-pointer ${
+                  isActive ? 'text-[var(--foreground)]' : 'text-[var(--text-muted)] hover:text-[var(--foreground)]'
+                }`}
+              >
+                {link.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="header-nav-underline"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary-custom)] rounded-full"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </a>
+            );
+          })}
         </nav>
 
         {/* Action Controls */}
         <div className="flex items-center gap-4">
           {/* Theme Selector */}
-          <div className="flex items-center gap-0.5 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--card-border)]">
+          <div className="flex items-center gap-0.5 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--card-border)] relative">
             {[
               { mode: 'dark' as const, icon: Moon, label: 'Dark' },
               { mode: 'light' as const, icon: Sun, label: 'Light' },
@@ -72,13 +112,20 @@ export const Header: React.FC = () => {
                 key={mode}
                 onClick={() => setTheme(mode)}
                 title={`${label} theme`}
-                className={`p-1.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                className={`p-1.5 rounded-lg transition-all duration-200 cursor-pointer relative z-10 ${
                   theme === mode
-                    ? 'bg-[var(--primary-custom)] text-black'
+                    ? 'text-black font-semibold'
                     : 'text-[var(--text-muted)] hover:text-[var(--foreground)]'
                 }`}
               >
                 <Icon size={12} />
+                {theme === mode && (
+                  <motion.div
+                    layoutId="header-active-theme-bg"
+                    className="absolute inset-0 bg-[var(--primary-custom)] rounded-lg -z-10"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
               </button>
             ))}
           </div>

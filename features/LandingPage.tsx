@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Button, Card, Slider, ProgressBar } from '../components/ui';
+import { Button, Card, Slider, ProgressBar, AnimatedCounter } from '../components/ui';
 import { Header } from '../components/Header';
 import {
   Sparkles, ArrowRight, ShieldCheck, Clock, Award, CheckCircle2,
@@ -10,6 +10,16 @@ import {
   Flame, HelpCircle, Info
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { motion, Variants } from 'framer-motion';
+
+const sectionVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+  }
+};
 
 // Dynamically load charts to avoid hydration shifts on client-side rendering
 const HeroPreviewChart = dynamic(() => import('../components/charts/HeroPreviewChart'), { ssr: false });
@@ -120,7 +130,12 @@ export const LandingPage: React.FC = () => {
       {/* ── SECTION 1: HERO ── */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Left Side: Headline & Proposition */}
-        <div className="lg:col-span-6 flex flex-col gap-6 text-left">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:col-span-6 flex flex-col gap-6 text-left"
+        >
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--primary-dim)] border border-[var(--primary-custom)]/20 text-[var(--primary-custom)] text-xs font-semibold w-fit">
             <ShieldCheck size={13} />
             Trusted Wealth Planning Platform
@@ -146,10 +161,15 @@ export const LandingPage: React.FC = () => {
               View Demo
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Side: Realistic App Interface Preview */}
-        <div className="lg:col-span-6 w-full">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+          className="lg:col-span-6 w-full"
+        >
           <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--background-secondary)] shadow-2xl p-6 relative overflow-hidden flex flex-col gap-5 select-none transition-all duration-300">
             {/* Header Toolbar */}
             <div className="flex justify-between items-center border-b border-[var(--card-border)] pb-3">
@@ -202,11 +222,17 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── SECTION 2: TRUST STRIP ── */}
-      <section className="relative z-10 border-y border-[var(--card-border)] bg-[var(--background-secondary)]/30 py-8 select-none">
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 border-y border-[var(--card-border)] bg-[var(--background-secondary)]/30 py-8 select-none"
+      >
         <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-6">
           <span className="text-xs font-mono font-bold text-[var(--text-subtle)] uppercase tracking-widest block w-full lg:w-auto text-center lg:text-left mb-2 lg:mb-0">
             PROJECTION CAPABILITIES
@@ -227,10 +253,17 @@ export const LandingPage: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 3: WHY SIPLYTICS ── */}
-      <section id="why-siplytics" className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full flex flex-col items-center text-center">
+      <motion.section
+        id="why-siplytics"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full flex flex-col items-center text-center"
+      >
         <div className="max-w-3xl flex flex-col gap-5">
           <span className="text-xs font-bold uppercase tracking-widest text-[var(--primary-custom)] bg-[var(--primary-dim)] border border-[var(--primary-custom)]/20 rounded-full px-3 py-1 w-fit mx-auto">
             Why We Exist
@@ -271,10 +304,17 @@ export const LandingPage: React.FC = () => {
             </Card>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 4: PROBLEM COMPARISON ── */}
-      <section id="comparison" className="relative z-10 max-w-7xl mx-auto px-6 py-12 w-full">
+      <motion.section
+        id="comparison"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-12 w-full"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Text Left */}
           <div className="lg:col-span-5 flex flex-col gap-5 text-left">
@@ -322,10 +362,17 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 5: FEATURE SHOWCASE ── */}
-      <section id="features" className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full flex flex-col gap-24">
+      <motion.section
+        id="features"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full flex flex-col gap-24"
+      >
         {/* Title */}
         <div className="max-w-2xl text-left">
           <span className="text-xs font-bold uppercase tracking-widest text-[var(--primary-custom)] bg-[var(--primary-dim)] border border-[var(--primary-custom)]/20 rounded-full px-3 py-1 w-fit">
@@ -337,7 +384,10 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Feature 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <motion.div
+          variants={sectionVariants}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+        >
           <div className="lg:col-span-7 rounded-2xl border border-[var(--card-border)] bg-[var(--background-secondary)] p-6 relative select-none">
             {/* Mock Panel */}
             <div className="flex flex-col gap-4 text-left">
@@ -371,10 +421,13 @@ export const LandingPage: React.FC = () => {
               Model compound returns with step-up optimization. Track how small yearly contribution increases dynamically amplify your terminal wealth corpus over 10 to 40 years.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <motion.div
+          variants={sectionVariants}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+        >
           <div className="lg:col-span-5 text-left flex flex-col gap-4 order-2 lg:order-1">
             <h3 className="text-2xl font-bold font-space text-[var(--foreground)]">Risk Intelligence</h3>
             <p className="text-sm text-[var(--text-muted)] leading-relaxed">
@@ -403,10 +456,13 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature 3 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <motion.div
+          variants={sectionVariants}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+        >
           <div className="lg:col-span-7 rounded-2xl border border-[var(--card-border)] bg-[var(--background-secondary)] p-6 relative select-none">
             {/* Mock Panel */}
             <div className="flex flex-col gap-4 text-left">
@@ -432,10 +488,13 @@ export const LandingPage: React.FC = () => {
               Verify how many years your corpus will last post-retirement. Factor in dynamic inflation adjustments to protect your purchasing power during your retirement years.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature 4 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <motion.div
+          variants={sectionVariants}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+        >
           <div className="lg:col-span-5 text-left flex flex-col gap-4 order-2 lg:order-1">
             <h3 className="text-2xl font-bold font-space text-[var(--foreground)]">FIRE Calculator</h3>
             <p className="text-sm text-[var(--text-muted)] leading-relaxed">
@@ -458,10 +517,13 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Feature 5 */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <motion.div
+          variants={sectionVariants}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+        >
           <div className="lg:col-span-7 rounded-2xl border border-[var(--card-border)] bg-[var(--background-secondary)] p-6 relative select-none">
             {/* Mock Panel */}
             <div className="flex flex-col gap-4 text-left">
@@ -491,11 +553,18 @@ export const LandingPage: React.FC = () => {
               Stress-test model parameters across 1,000 yields pathways. Review probability bands (Best Case, Median, and worst-case scenarios) to protect against downside risks.
             </p>
           </div>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* ── SECTION 6: INTERACTIVE EXPERIENCE ── */}
-      <section id="interactive-calculator" className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full bg-[var(--background-secondary)]/30 border-y border-[var(--card-border)]">
+      <motion.section
+        id="interactive-calculator"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full bg-[var(--background-secondary)]/30 border-y border-[var(--card-border)]"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Controls Left */}
           <div className="lg:col-span-5 text-left flex flex-col gap-5">
@@ -521,11 +590,15 @@ export const LandingPage: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-5 rounded-2xl glass border border-card-border/80 flex flex-col justify-between min-h-[120px]">
                 <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Total Principal Invested</span>
-                <h3 className="text-xl font-bold font-space text-[var(--foreground)] mt-2">{fmt(finalInvested)}</h3>
+                <h3 className="text-xl font-bold font-space text-[var(--foreground)] mt-2">
+                  <AnimatedCounter value={finalInvested} formatter={fmt} />
+                </h3>
               </div>
               <div className="p-5 rounded-2xl glass border border-card-border/80 flex flex-col justify-between min-h-[120px]">
                 <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Future Projected wealth</span>
-                <h3 className="text-xl font-bold font-space text-[var(--primary-custom)] mt-2">{fmt(finalWealth)}</h3>
+                <h3 className="text-xl font-bold font-space text-[var(--primary-custom)] mt-2">
+                  <AnimatedCounter value={finalWealth} formatter={fmt} />
+                </h3>
               </div>
             </div>
 
@@ -536,7 +609,7 @@ export const LandingPage: React.FC = () => {
                   Compounding Power Multiplier
                 </span>
                 <span className="text-[11px] text-[var(--text-muted)] mt-1">
-                  Your investments compound to <strong className="text-[var(--foreground)]">{(finalWealth / Math.max(1, finalInvested)).toFixed(1)}×</strong> your principal principal.
+                  Your investments compound to <strong className="text-[var(--foreground)]"><AnimatedCounter value={finalWealth / Math.max(1, finalInvested)} formatter={(v) => v.toFixed(1)} />×</strong> your principal principal.
                 </span>
               </div>
             </div>
@@ -546,10 +619,16 @@ export const LandingPage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 7: FINANCIAL ROADMAP ── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full text-center select-none">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full text-center select-none"
+      >
         <div className="max-w-2xl mx-auto mb-16 flex flex-col gap-3">
           <span className="text-xs font-bold uppercase tracking-widest text-[var(--secondary-custom)] bg-[var(--secondary-dim)] border border-[var(--secondary-custom)]/20 rounded-full px-3 py-1 w-fit mx-auto">
             Timeline Map
@@ -563,7 +642,21 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Roadmap Timeline */}
-        <div className="relative border-l-2 border-[var(--card-border)] pl-8 ml-4 md:ml-0 md:border-l-0 md:pl-0 md:grid md:grid-cols-7 gap-4 text-left md:text-center items-start">
+        <div className="relative pl-8 ml-4 md:ml-0 md:pl-0 md:grid md:grid-cols-7 gap-4 text-left md:text-center items-start">
+          {/* Background track line */}
+          <div className="absolute left-[3px] top-3 bottom-3 w-[2px] bg-[var(--card-border)] md:left-[5%] md:right-[5%] md:top-[11px] md:bottom-auto md:w-auto md:h-[2px]" />
+          
+          {/* Active progress line that fills up on scroll */}
+          <div className="absolute left-[3px] top-3 bottom-3 w-[2px] md:left-[5%] md:right-[5%] md:top-[11px] md:bottom-auto md:w-auto md:h-[2px] overflow-hidden">
+            <motion.div
+              className="bg-gradient-to-b from-[var(--primary-custom)] to-[var(--secondary-custom)] md:bg-gradient-to-r h-full w-full origin-top md:origin-left"
+              initial={{ scaleY: 0, scaleX: 0 }}
+              whileInView={{ scaleY: 1, scaleX: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+
           {[
             { step: '01', title: 'Start Investing', desc: 'Begin standard monthly SIP allocations.' },
             { step: '02', title: 'Emergency Fund', desc: 'Set aside 6 months of living costs.' },
@@ -575,18 +668,30 @@ export const LandingPage: React.FC = () => {
           ].map((road, idx) => (
             <div key={idx} className="relative md:flex md:flex-col md:items-center gap-2 mb-10 md:mb-0 group">
               {/* Dot indicator */}
-              <div className="absolute -left-[41px] md:left-1/2 md:-translate-x-1/2 -top-1 md:-top-[21px] h-6 w-6 rounded-full bg-[var(--background)] border border-[var(--card-border)] flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)] group-hover:border-[var(--primary-custom)] group-hover:text-[var(--primary-custom)] transition-all">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.4, delay: idx * 0.1, ease: "easeOut" }}
+                className="absolute -left-[41px] md:left-1/2 md:-translate-x-1/2 -top-1 md:-top-[21px] h-6 w-6 rounded-full bg-[var(--background)] border border-[var(--card-border)] flex items-center justify-center text-[10px] font-bold text-[var(--text-muted)] group-hover:border-[var(--primary-custom)] group-hover:text-[var(--primary-custom)] transition-all z-10"
+              >
                 {road.step}
-              </div>
+              </motion.div>
               <h4 className="font-space font-bold text-xs text-[var(--foreground)] group-hover:text-[var(--primary-custom)] transition-colors mt-0 md:mt-4">{road.title}</h4>
               <p className="text-[10px] text-[var(--text-muted)] leading-relaxed mt-1 max-w-[130px] md:mx-auto">{road.desc}</p>
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 8: PORTFOLIO INSIGHTS ── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-12 w-full text-left">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-12 w-full text-left"
+      >
         <div className="max-w-2xl mb-12">
           <span className="text-xs font-bold uppercase tracking-widest text-[var(--primary-custom)] bg-[var(--primary-dim)] border border-[var(--primary-custom)]/20 rounded-full px-3 py-1 w-fit">
             Insights Feed
@@ -632,10 +737,17 @@ export const LandingPage: React.FC = () => {
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 9: METHODOLOGY ── */}
-      <section id="methodology" className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full bg-[var(--background-secondary)]/10 border-t border-[var(--card-border)]">
+      <motion.section
+        id="methodology"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full bg-[var(--background-secondary)]/10 border-t border-[var(--card-border)]"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
           <div className="lg:col-span-5 flex flex-col gap-5">
             <span className="text-xs font-bold uppercase tracking-widest text-[var(--primary-custom)] bg-[var(--primary-dim)] border border-[var(--primary-custom)]/20 rounded-full px-3 py-1 w-fit">
@@ -675,10 +787,16 @@ export const LandingPage: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── SECTION 10: FINAL CTA & REGULATORY DISCLOSURES ── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full text-center flex flex-col items-center">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={sectionVariants}
+        className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full text-center flex flex-col items-center"
+      >
         <div className="max-w-2xl flex flex-col gap-6">
           <h2 className="text-3xl md:text-4xl font-bold font-space text-[var(--foreground)] tracking-tight">
             Make Better Financial Decisions.
@@ -707,7 +825,7 @@ export const LandingPage: React.FC = () => {
             This tool is designed for informational and educational purposes only and does not constitute formal financial, investment, or tax advice. Consult a qualified financial advisor before making actual investment decisions.
           </p>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

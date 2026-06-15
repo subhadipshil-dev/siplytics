@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Slider, Input } from '../components/ui';
+import { Card, Slider, Input, AnimatedCounter } from '../components/ui';
 import {
   TrendingUp,
   Award,
@@ -161,25 +161,25 @@ export const RetirementPlanner: React.FC = () => {
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Target Corpus</span>
             <span className="text-lg font-bold font-space text-white mt-1">
-              {formatCurrency(retirementOutputs.requiredRetirementCorpus)}
+              <AnimatedCounter value={retirementOutputs.requiredRetirementCorpus} formatter={formatCurrency} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Projected Corpus</span>
             <span className="text-lg font-bold font-space text-primary-custom mt-1">
-              {formatCurrency(retirementOutputs.projectedCorpusAtRetirement)}
+              <AnimatedCounter value={retirementOutputs.projectedCorpusAtRetirement} formatter={formatCurrency} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Safe Withdrawal/mo</span>
             <span className="text-lg font-bold font-space text-success-custom mt-1">
-              {formatCurrency(retirementOutputs.safeWithdrawalAmount)}
+              <AnimatedCounter value={retirementOutputs.safeWithdrawalAmount} formatter={formatCurrency} />
             </span>
           </div>
           <div className="p-4 rounded-2xl glass border border-card-border/80 flex flex-col">
             <span className="text-xs text-text-muted">Readiness Score</span>
             <span className="text-lg font-bold font-space text-warning-custom mt-1">
-              {retirementOutputs.retirementReadinessScore}%
+              <AnimatedCounter value={retirementOutputs.retirementReadinessScore} suffix="%" />
             </span>
           </div>
         </div>
@@ -193,7 +193,7 @@ export const RetirementPlanner: React.FC = () => {
                 Retirement Funding Deficit
               </span>
               <span>
-                Your projected wealth falls short of the target by <span className="font-bold text-danger-custom">{formatCurrency(deficit)}</span>. Consider increasing monthly investments by ₹3,500 or delaying retirement by 3 years to close this gap.
+                Your projected wealth falls short of the target by <span className="font-bold text-danger-custom"><AnimatedCounter value={deficit} formatter={formatCurrency} /></span>. Consider increasing monthly investments by ₹3,500 or delaying retirement by 3 years to close this gap.
               </span>
             </div>
           </div>
@@ -205,7 +205,7 @@ export const RetirementPlanner: React.FC = () => {
                 Retirement Fully Funded!
               </span>
               <span>
-                Congratulations! Your projected corpus exceeds the required fund by <span className="font-bold text-success-custom">{formatCurrency(-deficit)}</span>. You have a highly secure retirement path.
+                Congratulations! Your projected corpus exceeds the required fund by <span className="font-bold text-success-custom"><AnimatedCounter value={-deficit} formatter={formatCurrency} /></span>. You have a highly secure retirement path.
               </span>
             </div>
           </div>
