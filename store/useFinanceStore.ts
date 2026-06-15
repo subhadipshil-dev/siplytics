@@ -169,7 +169,7 @@ export const useFinanceStore = create<FinanceState>()(
       const initTaxOutputs = calculateTax(defaultTaxInputs);
 
       return {
-        activeTab: 'dashboard',
+        activeTab: 'landing',
         theme: 'dark',
         setActiveTab: (activeTab) => set({ activeTab }),
         setTheme: (theme) => set({ theme }),
