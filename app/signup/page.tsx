@@ -9,7 +9,8 @@ import { Button } from '../../components/ui';
 
 function SignupContent() {
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/dashboard';
+  const rawRedirect = searchParams.get('redirect') || '/';
+  const redirectPath = rawRedirect === '/dashboard' || rawRedirect === '/calculator' ? '/' : rawRedirect;
 
   const { signup, loginWithGoogle, continueAsGuest, error, clearError, loading } = useAuthStore();
   
@@ -65,7 +66,7 @@ function SignupContent() {
 
   const handleGuestLogin = () => {
     continueAsGuest();
-    window.location.href = redirectPath === '/dashboard' ? '/calculator' : redirectPath;
+    window.location.href = redirectPath;
   };
 
   return (
@@ -176,6 +177,21 @@ function SignupContent() {
             <p className="text-xs text-[var(--text-muted)]">
               Create an account below to unlock syncing, scenario comparisons, and onboarding.
             </p>
+          </div>
+
+          {/* Segmented Auth Toggle */}
+          <div className="flex bg-[#0c0e1a]/60 border border-[var(--card-border)] p-1 rounded-xl w-full">
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="flex-1 text-center py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-white rounded-lg transition-colors cursor-pointer"
+            >
+              Sign In
+            </button>
+            <button
+              className="flex-1 text-center py-2 text-xs font-bold bg-[var(--primary-custom)] text-black rounded-lg cursor-default"
+            >
+              Create Account
+            </button>
           </div>
 
           {/* Form */}

@@ -9,7 +9,8 @@ import { Button } from '../../components/ui';
 
 function LoginContent() {
   const searchParams = useSearchParams();
-  const redirectPath = searchParams.get('redirect') || '/dashboard';
+  const rawRedirect = searchParams.get('redirect') || '/';
+  const redirectPath = rawRedirect === '/dashboard' || rawRedirect === '/calculator' ? '/' : rawRedirect;
 
   const { login, loginWithMagicLink, loginWithGoogle, continueAsGuest, error, clearError, loading } = useAuthStore();
   
@@ -67,8 +68,7 @@ function LoginContent() {
 
   const handleGuestLogin = () => {
     continueAsGuest();
-    // Redirect guest user to calculator or dashboard
-    window.location.href = redirectPath === '/dashboard' ? '/calculator' : redirectPath;
+    window.location.href = redirectPath;
   };
 
   return (
@@ -179,6 +179,21 @@ function LoginContent() {
             <p className="text-xs text-[var(--text-muted)]">
               Welcome back. Sign in below to sync your goals and allocations.
             </p>
+          </div>
+
+          {/* Segmented Auth Toggle */}
+          <div className="flex bg-[#0c0e1a]/60 border border-[var(--card-border)] p-1 rounded-xl w-full">
+            <button
+              className="flex-1 text-center py-2 text-xs font-bold bg-[var(--primary-custom)] text-black rounded-lg cursor-default"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => window.location.href = '/signup'}
+              className="flex-1 text-center py-2 text-xs font-semibold text-[var(--text-muted)] hover:text-white rounded-lg transition-colors cursor-pointer"
+            >
+              Create Account
+            </button>
           </div>
 
           {/* Tab Selector between Magic Link and Password */}
