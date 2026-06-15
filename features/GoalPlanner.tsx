@@ -235,7 +235,7 @@ export const GoalPlanner: React.FC = () => {
                         <div>
                           <h4 className="font-space font-bold text-base text-white">{goal.name}</h4>
                           <div className="flex gap-3 text-[10px] text-text-muted mt-1 uppercase font-mono">
-                            <span>Horizon: {goal.yearsToReach || goal.yearsRemaining} Years</span>
+                            <span>Horizon: {goal.yearsRemaining} Years</span>
                             <span>Yield: {goal.expectedReturn}%</span>
                           </div>
                         </div>
