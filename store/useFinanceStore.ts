@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { createClient } from '../utils/supabase/client';
+import { useAuthStore } from './useAuthStore';
 import {
   SipInputs,
   SipOutputs,
@@ -30,6 +32,42 @@ import {
   calculateNetWorth,
   calculateTax
 } from '../utils/finance';
+
+// Debounce timer for preferences syncing
+let prefDebounceTimer: NodeJS.Timeout | null = null;
+
+const syncPreferencesToCloud = (state: any) => {
+  if (typeof window === 'undefined') return;
+  const user = useAuthStore.getState().user;
+  if (!user) return;
+
+  if (prefDebounceTimer) {
+    clearTimeout(prefDebounceTimer);
+  }
+
+  prefDebounceTimer = setTimeout(async () => {
+    const supabase = createClient();
+    const prefData = {
+      user_id: user.id,
+      theme: state.theme,
+      risk_profile: state.sipInputs.riskProfile,
+      preferred_currency: 'INR',
+      saved_assumptions: {
+        sipInputs: state.sipInputs,
+        portfolio: state.portfolio,
+        retirementInputs: state.retirementInputs,
+        fireInputs: state.fireInputs,
+        emergencyInputs: state.emergencyInputs,
+        passiveIncomeInputs: state.passiveIncomeInputs,
+        netWorthInputs: state.netWorthInputs,
+        taxInputs: state.taxInputs
+      },
+      updated_at: new Date().toISOString()
+    };
+
+    await supabase.from('user_preferences').upsert(prefData);
+  }, 2000);
+};
 
 interface FinanceState {
   // Navigation & UI
@@ -74,6 +112,7 @@ interface FinanceState {
   saveCurrentScenario: (name: string) => void;
   deleteScenario: (id: string) => void;
   loadScenario: (scenario: Scenario) => void;
+  fetchAndSyncCloudData: () => Promise<void>;
 }
 
 const defaultSipInputs: SipInputs = {
@@ -172,7 +211,10 @@ export const useFinanceStore = create<FinanceState>()(
         activeTab: 'landing',
         theme: 'dark',
         setActiveTab: (activeTab) => set({ activeTab }),
-        setTheme: (theme) => set({ theme }),
+        setTheme: (theme) => {
+          set({ theme });
+          syncPreferencesToCloud(get());
+        },
 
         // Initial States
         sipInputs: defaultSipInputs,
@@ -227,12 +269,14 @@ export const useFinanceStore = create<FinanceState>()(
           const updatedInputs = { ...get().sipInputs, ...newInputs };
           const updatedOutputs = calculateSip(updatedInputs);
           set({ sipInputs: updatedInputs, sipOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         updatePortfolio: (newAlloc) => {
           const updatedAlloc = { ...get().portfolio, ...newAlloc };
           const updatedMetrics = calculatePortfolioMetrics(updatedAlloc);
           set({ portfolio: updatedAlloc, portfolioMetrics: updatedMetrics });
+          syncPreferencesToCloud(get());
         },
 
         addGoal: (goalData) => {
@@ -274,34 +318,62 @@ export const useFinanceStore = create<FinanceState>()(
           };
 
           set((state) => ({ goals: [...state.goals, newGoal] }));
+
+          // Sync to Supabase if authenticated
+          const user = useAuthStore.getState().user;
+          if (user) {
+            const supabase = createClient();
+            supabase.from('goals').insert({
+              id: newGoal.id,
+              user_id: user.id,
+              name: newGoal.name,
+              type: newGoal.type,
+              target_amount: newGoal.targetAmount,
+              current_savings: newGoal.currentSavings,
+              years_remaining: newGoal.yearsRemaining,
+              expected_return: newGoal.expectedReturn,
+            }).then(({ error }) => { if (error) console.error('Error syncing goal:', error); });
+          }
         },
 
         deleteGoal: (id) => {
           set((state) => ({ goals: state.goals.filter((g) => g.id !== id) }));
+
+          // Sync to Supabase if authenticated
+          const user = useAuthStore.getState().user;
+          if (user) {
+            const supabase = createClient();
+            supabase.from('goals').delete().eq('id', id)
+              .then(({ error }) => { if (error) console.error('Error deleting goal:', error); });
+          }
         },
 
         updateRetirementInputs: (newInputs) => {
           const updatedInputs = { ...get().retirementInputs, ...newInputs };
           const updatedOutputs = calculateRetirement(updatedInputs);
           set({ retirementInputs: updatedInputs, retirementOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         updateFireInputs: (newInputs) => {
           const updatedInputs = { ...get().fireInputs, ...newInputs };
           const updatedOutputs = calculateFire(updatedInputs);
           set({ fireInputs: updatedInputs, fireOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         updateEmergencyInputs: (newInputs) => {
           const updatedInputs = { ...get().emergencyInputs, ...newInputs };
           const updatedOutputs = calculateEmergencyFund(updatedInputs);
           set({ emergencyInputs: updatedInputs, emergencyOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         updatePassiveIncomeInputs: (newInputs) => {
           const updatedInputs = { ...get().passiveIncomeInputs, ...newInputs };
           const updatedOutputs = calculatePassiveIncome(updatedInputs);
           set({ passiveIncomeInputs: updatedInputs, passiveIncomeOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         updateNetWorthInputs: (newInputs) => {
@@ -310,12 +382,14 @@ export const useFinanceStore = create<FinanceState>()(
           const updatedInputs = { assets: updatedAssets, liabilities: updatedLiabilities };
           const updatedOutputs = calculateNetWorth(updatedInputs);
           set({ netWorthInputs: updatedInputs, netWorthOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         updateTaxInputs: (newInputs) => {
           const updatedInputs = { ...get().taxInputs, ...newInputs };
           const updatedOutputs = calculateTax(updatedInputs);
           set({ taxInputs: updatedInputs, taxOutputs: updatedOutputs });
+          syncPreferencesToCloud(get());
         },
 
         saveCurrentScenario: (name) => {
@@ -328,10 +402,32 @@ export const useFinanceStore = create<FinanceState>()(
             timestamp: Date.now()
           };
           set((state) => ({ scenarios: [...state.scenarios, newScenario] }));
+
+          // Sync to Supabase if authenticated
+          const user = useAuthStore.getState().user;
+          if (user) {
+            const supabase = createClient();
+            supabase.from('scenarios').insert({
+              id: newScenario.id,
+              user_id: user.id,
+              name: newScenario.name,
+              inputs: newScenario.inputs,
+              outputs: newScenario.outputs,
+              portfolio: newScenario.portfolio,
+            }).then(({ error }) => { if (error) console.error('Error saving scenario:', error); });
+          }
         },
 
         deleteScenario: (id) => {
           set((state) => ({ scenarios: state.scenarios.filter((s) => s.id !== id) }));
+
+          // Sync to Supabase if authenticated
+          const user = useAuthStore.getState().user;
+          if (user) {
+            const supabase = createClient();
+            supabase.from('scenarios').delete().eq('id', id)
+              .then(({ error }) => { if (error) console.error('Error deleting scenario:', error); });
+          }
         },
 
         loadScenario: (scenario) => {
@@ -341,6 +437,138 @@ export const useFinanceStore = create<FinanceState>()(
             portfolio: scenario.portfolio,
             portfolioMetrics: calculatePortfolioMetrics(scenario.portfolio)
           });
+          syncPreferencesToCloud(get());
+        },
+
+        fetchAndSyncCloudData: async () => {
+          const user = useAuthStore.getState().user;
+          if (!user) return;
+          const supabase = createClient();
+
+          // 1. Fetch Goals
+          const { data: goalsData } = await supabase
+            .from('goals')
+            .select('*')
+            .eq('user_id', user.id);
+
+          if (goalsData) {
+            const parsedGoals = goalsData.map((g: any) => {
+              const targetAmount = Number(g.target_amount);
+              const currentSavings = Number(g.current_savings);
+              const yearsRemaining = Number(g.years_remaining);
+              const expectedReturn = Number(g.expected_return);
+
+              const r = expectedReturn / 12 / 100;
+              const months = yearsRemaining * 12;
+              const fvSavings = currentSavings * Math.pow(1 + expectedReturn / 100, yearsRemaining);
+              const gap = Math.max(0, targetAmount - fvSavings);
+
+              let requiredSip = 0;
+              if (gap > 0 && r > 0) {
+                requiredSip = Math.round(gap / (((Math.pow(1 + r, months) - 1) / r) * (1 + r)));
+              }
+
+              const requiredLumpsum = Math.round(targetAmount / Math.pow(1 + expectedReturn / 100, yearsRemaining));
+              const progressPercent = Math.min(100, Math.round((currentSavings / targetAmount) * 100));
+              const achievementProbability = Math.round(Math.min(99, Math.max(5, 100 - (yearsRemaining * 2) - (gap / targetAmount) * 30)));
+
+              return {
+                id: g.id,
+                name: g.name,
+                type: g.type,
+                targetAmount,
+                currentSavings,
+                yearsRemaining,
+                expectedReturn,
+                requiredSip,
+                requiredLumpsum,
+                achievementProbability,
+                progressPercent,
+                gapAmount: Math.round(gap)
+              };
+            });
+            set({ goals: parsedGoals });
+          }
+
+          // 2. Fetch Scenarios
+          const { data: scenariosData } = await supabase
+            .from('scenarios')
+            .select('*')
+            .eq('user_id', user.id);
+
+          if (scenariosData) {
+            const parsedScenarios = scenariosData.map((s: any) => ({
+              id: s.id,
+              name: s.name,
+              inputs: s.inputs,
+              outputs: s.outputs,
+              portfolio: s.portfolio,
+              timestamp: new Date(s.created_at).getTime()
+            }));
+            set({ scenarios: parsedScenarios });
+          }
+
+          // 3. Fetch Preferences
+          const { data: prefData } = await supabase
+            .from('user_preferences')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (prefData) {
+            set({ theme: prefData.theme as any });
+            if (prefData.saved_assumptions) {
+              const assumptions = prefData.saved_assumptions;
+              if (assumptions.sipInputs) {
+                set({
+                  sipInputs: assumptions.sipInputs,
+                  sipOutputs: calculateSip(assumptions.sipInputs)
+                });
+              }
+              if (assumptions.portfolio) {
+                set({
+                  portfolio: assumptions.portfolio,
+                  portfolioMetrics: calculatePortfolioMetrics(assumptions.portfolio)
+                });
+              }
+              if (assumptions.retirementInputs) {
+                set({
+                  retirementInputs: assumptions.retirementInputs,
+                  retirementOutputs: calculateRetirement(assumptions.retirementInputs)
+                });
+              }
+              if (assumptions.fireInputs) {
+                set({
+                  fireInputs: assumptions.fireInputs,
+                  fireOutputs: calculateFire(assumptions.fireInputs)
+                });
+              }
+              if (assumptions.emergencyInputs) {
+                set({
+                  emergencyInputs: assumptions.emergencyInputs,
+                  emergencyOutputs: calculateEmergencyFund(assumptions.emergencyInputs)
+                });
+              }
+              if (assumptions.passiveIncomeInputs) {
+                set({
+                  passiveIncomeInputs: assumptions.passiveIncomeInputs,
+                  passiveIncomeOutputs: calculatePassiveIncome(assumptions.passiveIncomeInputs)
+                });
+              }
+              if (assumptions.netWorthInputs) {
+                set({
+                  netWorthInputs: assumptions.netWorthInputs,
+                  netWorthOutputs: calculateNetWorth(assumptions.netWorthInputs)
+                });
+              }
+              if (assumptions.taxInputs) {
+                set({
+                  taxInputs: assumptions.taxInputs,
+                  taxOutputs: calculateTax(assumptions.taxInputs)
+                });
+              }
+            }
+          }
         }
       };
     },

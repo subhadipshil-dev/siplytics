@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { DashboardShell } from '../components/DashboardShell';
 import { LandingPage } from '../features/LandingPage';
 import { Dashboard } from '../features/Dashboard';
@@ -14,11 +15,24 @@ import { RiskAnalysis } from '../features/RiskAnalysis';
 import { Simulations } from '../features/Simulations';
 import { ExtraCalculators } from '../features/ExtraCalculators';
 import { Reports } from '../features/Reports';
+import { SettingsView } from '../features/SettingsView';
+
 
 export default function Home() {
-  const { activeTab } = useFinanceStore();
+  const { activeTab, setActiveTab } = useFinanceStore();
+  const { user, isGuest } = useAuthStore();
 
-  if (activeTab === 'landing') {
+  // If a session starts, automatically transition activeTab out of 'landing'
+  useEffect(() => {
+    if ((user || isGuest) && activeTab === 'landing') {
+      setActiveTab(user ? 'dashboard' : 'sip-calc');
+    } else if (!user && !isGuest && activeTab !== 'landing') {
+      setActiveTab('landing');
+    }
+  }, [user, isGuest, activeTab]);
+
+  // If logged out and not a guest, render the landing page directly
+  if (!user && !isGuest) {
     return <LandingPage />;
   }
 
@@ -44,6 +58,8 @@ export default function Home() {
         return <ExtraCalculators />;
       case 'reports':
         return <Reports />;
+      case 'settings':
+        return <SettingsView />;
       default:
         return <Dashboard />;
     }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { Button, Card, Slider, ProgressBar, AnimatedCounter } from '../components/ui';
 import { Header } from '../components/Header';
 import {
@@ -26,6 +27,24 @@ const HeroPreviewChart = dynamic(() => import('../components/charts/HeroPreviewC
 
 export const LandingPage: React.FC = () => {
   const { setActiveTab, updateSipInputs } = useFinanceStore();
+  const { user, isGuest } = useAuthStore();
+  
+  const handleLaunchApp = () => {
+    if (user || isGuest) {
+      setActiveTab(user ? 'dashboard' : 'sip-calc');
+    } else {
+      window.location.href = '/login';
+    }
+  };
+
+  const handleLaunchSignup = () => {
+    if (user || isGuest) {
+      setActiveTab(user ? 'dashboard' : 'sip-calc');
+    } else {
+      window.location.href = '/signup';
+    }
+  };
+
   const [quickSip, setQuickSip] = useState(15000);
   const [quickYears, setQuickYears] = useState(15);
   const [quickStepUp, setQuickStepUp] = useState(10);
@@ -116,7 +135,11 @@ export const LandingPage: React.FC = () => {
       durationYears: quickYears,
       stepUpPercent: quickStepUp,
     });
-    setActiveTab('dashboard');
+    if (user || isGuest) {
+      setActiveTab(user ? 'dashboard' : 'sip-calc');
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   return (
@@ -154,10 +177,10 @@ export const LandingPage: React.FC = () => {
           </p>
 
           <div className="flex flex-wrap gap-4 mt-2">
-            <Button size="lg" glow onClick={() => setActiveTab('dashboard')}>
+            <Button size="lg" glow onClick={handleLaunchSignup}>
               Start Planning <ArrowRight size={16} />
             </Button>
-            <Button variant="secondary" size="lg" onClick={() => setActiveTab('dashboard')}>
+            <Button variant="secondary" size="lg" onClick={handleLaunchApp}>
               View Demo
             </Button>
           </div>
@@ -806,10 +829,10 @@ export const LandingPage: React.FC = () => {
           </p>
 
           <div className="flex justify-center gap-4 mt-2">
-            <Button size="lg" glow onClick={() => setActiveTab('dashboard')}>
+            <Button size="lg" glow onClick={handleLaunchSignup}>
               Start Planning <ArrowRight size={16} />
             </Button>
-            <Button variant="secondary" size="lg" onClick={() => setActiveTab('dashboard')}>
+            <Button variant="secondary" size="lg" onClick={handleLaunchApp}>
               Open Dashboard
             </Button>
           </div>

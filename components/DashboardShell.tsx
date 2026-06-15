@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Calculator, Target, Landmark, Flame,
   PieChart, ShieldAlert, LineChart, FileText, Coins,
   Sun, Moon, Monitor, Menu, X, Sparkles, Share2, TrendingUp,
+  CloudOff, User as UserIcon, Settings as SettingsIcon, LogOut
 } from 'lucide-react';
 import { Button } from './ui';
+import { GuestUpgradeModal } from './GuestUpgradeModal';
+import { OnboardingModal } from './OnboardingModal';
 
 interface SidebarItem {
   id:   string;
@@ -122,8 +126,21 @@ const NavItem: React.FC<{
 /* ─── DashboardShell ───────────────────────────────────────── */
 export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { activeTab, setActiveTab, theme, setTheme, sipOutputs } = useFinanceStore();
+  const { user, isGuest, logout, setUpgradeModalOpen } = useAuthStore();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [copied, setCopied]         = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   /* Sync theme on HTML root */
   useEffect(() => {
@@ -288,17 +305,42 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
           ))}
         </nav>
 
-        {/* Compounding Score */}
-        <div className="mx-3 mb-3 p-3.5 rounded-xl bg-[var(--primary-dim)] border border-[var(--primary-custom)]/20">
-          <div className="flex items-center gap-1.5 text-[var(--primary-custom)] font-semibold text-xs mb-1">
-            <Sparkles size={11} />
-            <span>Compounding Score</span>
+        {/* Sync Status / Account widget */}
+        {user ? (
+          <button
+            onClick={() => setActiveTab('settings')}
+            className="mx-3 mb-3 p-3 text-left rounded-xl bg-[var(--background-secondary)] hover:bg-[var(--card-bg-hover)] border border-[var(--card-border)] flex items-center gap-3 transition-colors cursor-pointer"
+          >
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--primary-custom)] to-[var(--secondary-custom)] flex items-center justify-center text-black font-black text-xs">
+              {user.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : user.email?.[0].toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-[11px] font-bold text-white truncate">
+                {user.user_metadata?.full_name || 'Member'}
+              </div>
+              <div className="flex items-center gap-1 mt-0.5 text-[9px] text-[var(--success-custom)] font-mono">
+                <div className="h-1 w-1 rounded-full bg-[var(--success-custom)] animate-pulse" />
+                <span>Cloud Synced</span>
+              </div>
+            </div>
+          </button>
+        ) : (
+          <div className="mx-3 mb-3 p-3.5 rounded-xl bg-[var(--warning-dim)]/30 border border-[var(--warning-custom)]/25">
+            <div className="flex items-center gap-1.5 text-[var(--warning-custom)] font-semibold text-xs mb-1">
+              <CloudOff size={11} />
+              <span>Offline Mode</span>
+            </div>
+            <p className="text-[10px] text-[var(--text-subtle)] leading-normal mt-0.5">
+              Sync calculations and goals to your cloud profile.
+            </p>
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="w-full text-center mt-2.5 py-1.5 rounded-lg bg-[var(--warning-custom)] text-black font-bold text-[10px] transition-opacity hover:opacity-90 cursor-pointer animate-pulse"
+            >
+              Connect Profile
+            </button>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] text-[var(--text-muted)]">Current grade</span>
-            <span className="font-mono text-[var(--foreground)] font-bold text-xs">A+ Excellent</span>
-          </div>
-        </div>
+        )}
 
         {/* Theme & Footer */}
         <div className="p-3 border-t border-[var(--card-border)] flex items-center justify-between gap-2">
@@ -336,6 +378,82 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
               </span>
               <span className="hidden sm:inline">projected</span>
             </div>
+
+            {/* Guest status warning or Profile dropdown */}
+            {!user ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setUpgradeModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--warning-dim)] border border-[var(--warning-custom)]/20 text-xs text-[var(--warning-custom)] cursor-pointer hover:bg-[var(--warning-dim)]/80 transition-colors"
+                >
+                  <CloudOff size={12} />
+                  <span className="hidden sm:inline font-semibold">Local Save Only</span>
+                </button>
+                <Button variant="outline" size="sm" onClick={() => window.location.href = '/login'}>
+                  Sign In
+                </Button>
+              </div>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--primary-custom)] to-[var(--secondary-custom)] flex items-center justify-center text-black font-black text-sm select-none cursor-pointer focus:outline-none shadow-[0_0_10px_rgba(0,212,245,0.2)]"
+                >
+                  {user.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : user.email?.[0].toUpperCase()}
+                </button>
+                
+                <AnimatePresence>
+                  {profileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-2 w-56 bg-[var(--background-secondary)] border border-[var(--card-border)] rounded-xl p-2 shadow-2xl z-50 font-inter text-[var(--foreground)]"
+                    >
+                      <div className="px-3 py-2 border-b border-[var(--card-border)] mb-1">
+                        <div className="text-xs font-bold text-white truncate">
+                          {user.user_metadata?.full_name || 'Member'}
+                        </div>
+                        <div className="text-[10px] text-[var(--text-subtle)] truncate mt-0.5 font-mono">
+                          {user.email}
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={() => { setProfileDropdownOpen(false); setActiveTab('dashboard'); }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[var(--card-bg-hover)] transition-colors flex items-center gap-2 cursor-pointer text-[var(--text-muted)] hover:text-white"
+                      >
+                        <LayoutDashboard size={12} />
+                        Overview
+                      </button>
+                      <button
+                        onClick={() => { setProfileDropdownOpen(false); setActiveTab('reports'); }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[var(--card-bg-hover)] transition-colors flex items-center gap-2 cursor-pointer text-[var(--text-muted)] hover:text-white"
+                      >
+                        <FileText size={12} />
+                        Saved Plans
+                      </button>
+                      <button
+                        onClick={() => { setProfileDropdownOpen(false); setActiveTab('settings'); }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[var(--card-bg-hover)] transition-colors flex items-center gap-2 cursor-pointer text-[var(--text-muted)] hover:text-white"
+                      >
+                        <SettingsIcon size={12} />
+                        Settings
+                      </button>
+                      
+                      <button
+                        onClick={() => { setProfileDropdownOpen(false); logout(); }}
+                        className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[var(--error-dim)] hover:text-[var(--error-custom)] transition-colors flex items-center gap-2 cursor-pointer mt-1 border-t border-[var(--card-border)] pt-2 text-[var(--text-muted)]"
+                      >
+                        <LogOut size={12} />
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </header>
 
@@ -355,6 +473,8 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
           </AnimatePresence>
         </div>
       </main>
+      <GuestUpgradeModal />
+      <OnboardingModal />
     </div>
   );
 };

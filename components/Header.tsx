@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { Button } from './ui';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const { theme, setTheme, setActiveTab } = useFinanceStore();
+  const { user, isGuest } = useAuthStore();
   const [activeSection, setActiveSection] = useState<string>('');
 
   const navLinks = [
@@ -48,6 +50,22 @@ export const Header: React.FC = () => {
     const target = document.querySelector(href);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleOpenApp = () => {
+    if (user || isGuest) {
+      setActiveTab(user ? 'dashboard' : 'sip-calc');
+    } else {
+      window.location.href = '/login';
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (user || isGuest) {
+      setActiveTab(user ? 'dashboard' : 'sip-calc');
+    } else {
+      window.location.href = '/signup';
     }
   };
 
@@ -133,7 +151,7 @@ export const Header: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setActiveTab('dashboard')}
+            onClick={handleOpenApp}
             className="text-xs"
           >
             Open App
@@ -142,7 +160,7 @@ export const Header: React.FC = () => {
           <Button
             variant="primary"
             size="sm"
-            onClick={() => setActiveTab('dashboard')}
+            onClick={handleGetStarted}
             className="text-xs hidden sm:flex"
             glow
           >

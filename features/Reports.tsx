@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { Card, Input, Button, AnimatedCounter } from '../components/ui';
 import { calculatePortfolioMetrics } from '../utils/finance';
 import dynamic from 'next/dynamic';
@@ -37,6 +38,7 @@ export const Reports: React.FC = () => {
     deleteScenario,
     loadScenario
   } = useFinanceStore();
+  const { isGuest, setUpgradeModalOpen } = useAuthStore();
 
   const [scenarioName, setScenarioName] = useState('');
   const [isExporting, setIsExporting] = useState(false);
@@ -50,12 +52,20 @@ export const Reports: React.FC = () => {
   const handleSaveScenario = (e: React.FormEvent) => {
     e.preventDefault();
     if (!scenarioName.trim()) return;
+    if (isGuest) {
+      setUpgradeModalOpen(true);
+      return;
+    }
     saveCurrentScenario(scenarioName);
     setScenarioName('');
   };
 
   // TXT Report Export
   const handleExportTXT = () => {
+    if (isGuest) {
+      setUpgradeModalOpen(true);
+      return;
+    }
     let text = `==================================================\n`;
     text += `          SIPlytics Wealth Intelligence Report\n`;
     text += `==================================================\n\n`;
@@ -108,6 +118,10 @@ export const Reports: React.FC = () => {
 
   // PDF Report Export using html2canvas & jsPDF
   const handleExportPDF = async () => {
+    if (isGuest) {
+      setUpgradeModalOpen(true);
+      return;
+    }
     const reportElement = document.getElementById('wealth-report-preview');
     if (!reportElement) return;
 

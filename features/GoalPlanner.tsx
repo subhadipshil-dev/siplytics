@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { Card, Input, Select, Button, Slider, ProgressBar, AnimatedCounter } from '../components/ui';
 import { GoalType } from '../types';
 import { Target, Plus, Trash2, AlertCircle, Home, Car, Heart, GraduationCap, Landmark, Plane, Flame } from 'lucide-react';
@@ -25,6 +26,7 @@ const goalIcons: Record<GoalType, React.ComponentType<{ size?: number; className
 
 export const GoalPlanner: React.FC = () => {
   const { goals, addGoal, deleteGoal } = useFinanceStore();
+  const { isGuest, setUpgradeModalOpen } = useAuthStore();
 
   const [name, setName]                 = useState('');
   const [type, setType]                 = useState<GoalType>('house');
@@ -36,6 +38,10 @@ export const GoalPlanner: React.FC = () => {
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
+    if (isGuest) {
+      setUpgradeModalOpen(true);
+      return;
+    }
     addGoal({ name, type, targetAmount, currentSavings, yearsRemaining, expectedReturn });
     setName(''); setTargetAmount(5000000); setSavings(500000); setYears(10); setReturn(12);
   };
