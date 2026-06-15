@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { Card, Slider, Input, Select, Button, ProgressBar } from '../components/ui';
 import { Coins, Landmark, ShieldCheck, FileText, ArrowRight, Info, PlusCircle, HelpCircle, Sparkles, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
+
+const ExtraChart = dynamic(() => import('../components/charts/ExtraChart'), { ssr: false });
 
 export const ExtraCalculators: React.FC = () => {
   const {
@@ -204,35 +206,7 @@ export const ExtraCalculators: React.FC = () => {
               <Card className="p-5 flex-1">
                 <h4 className="text-xs font-semibold text-text-muted mb-4">Assets vs Liabilities 10-Year Trend</h4>
                 <div className="h-60 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={netWorthOutputs.yearlyProjection} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                      <XAxis dataKey="year" stroke="var(--text-muted)" fontSize={10} tickLine={false} tickFormatter={(v) => `Yr ${v}`} />
-                      <YAxis
-                        stroke="var(--text-muted)"
-                        fontSize={10}
-                        tickLine={false}
-                        tickFormatter={(v) => {
-                          if (v >= 10000000) return `₹${(v / 10000000).toFixed(0)}Cr`;
-                          if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`;
-                          return `₹${v / 1000}K`;
-                        }}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          background: 'rgba(5, 8, 22, 0.95)',
-                          borderColor: 'rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
-                          fontSize: '11px'
-                        }}
-                        formatter={(v: any) => formatCurrency(v)}
-                      />
-                      <Legend wrapperStyle={{ fontSize: '10px' }} />
-                      <Bar dataKey="assets" name="Total Assets" fill="#00E5FF" radius={[3, 3, 0, 0]} />
-                      <Bar dataKey="liabilities" name="Liabilities" fill="#FF5252" radius={[3, 3, 0, 0]} />
-                      <Bar dataKey="netWorth" name="Net Worth" fill="#7C4DFF" radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <ExtraChart data={netWorthOutputs.yearlyProjection} formatCurrency={formatCurrency} />
                 </div>
               </Card>
             </div>

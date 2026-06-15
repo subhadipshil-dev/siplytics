@@ -8,8 +8,10 @@ import {
   Milestone as MilestoneIcon, CheckCircle, Clock, Compass,
   AlertTriangle, Flame, ArrowRight
 } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { calculateFinancialHealthScore, calculateRiskScore, getMilestones } from '../utils/finance';
+import dynamic from 'next/dynamic';
+
+const DashboardChart = dynamic(() => import('../components/charts/DashboardChart'), { ssr: false });
 
 export const Dashboard: React.FC = () => {
   const {
@@ -77,17 +79,7 @@ export const Dashboard: React.FC = () => {
         <Card className="lg:col-span-4 flex flex-col p-5">
           <h4 className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">Wealth Composition</h4>
           <div className="relative h-32 w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Tooltip
-                  contentStyle={{ background: 'var(--background-secondary)', borderColor: 'var(--card-border)', borderRadius: 8, fontSize: 11, color: 'var(--foreground)' }}
-                  formatter={(v: any) => [fmt(v), '']}
-                />
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={30} outerRadius={50} paddingAngle={4} dataKey="value">
-                  {pieData.map((e, i) => <Cell key={i} fill={e.color} />)}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+            <DashboardChart data={pieData} fmt={fmt} />
             <div className="absolute flex flex-col items-center justify-center">
               <span className="text-[9px] text-[var(--text-muted)] font-mono uppercase">Profit</span>
               <span className="text-xs font-bold font-space text-[var(--foreground)]">

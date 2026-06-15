@@ -12,15 +12,9 @@ import {
   Layers,
   HeartHandshake
 } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+import dynamic from 'next/dynamic';
+
+const RetirementChart = dynamic(() => import('../components/charts/RetirementChart'), { ssr: false });
 
 export const RetirementPlanner: React.FC = () => {
   const { retirementInputs, retirementOutputs, updateRetirementInputs } = useFinanceStore();
@@ -244,47 +238,7 @@ export const RetirementPlanner: React.FC = () => {
           {/* Tab 1: Accumulation & Drawdown Area Chart */}
           {activeTab === 'chart' && (
             <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorCorpus" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--primary-custom)" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="var(--primary-custom)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-                  <YAxis
-                    stroke="var(--text-muted)"
-                    fontSize={11}
-                    tickLine={false}
-                    tickFormatter={(v) => {
-                      if (v >= 10000000) return `₹${(v / 10000000).toFixed(1)}Cr`;
-                      if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`;
-                      return `₹${v / 1000}K`;
-                    }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(5, 8, 22, 0.95)',
-                      borderColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                      fontFamily: 'Space Grotesk'
-                    }}
-                    formatter={(value: any) => [formatCurrency(value), '']}
-                  />
-                  <Area
-                    type="monotone"
-                    name="Retirement Corpus"
-                    dataKey="Corpus"
-                    stroke="var(--primary-custom)"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#colorCorpus)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <RetirementChart data={chartData} formatCurrency={formatCurrency} />
             </div>
           )}
 

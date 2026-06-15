@@ -3,7 +3,9 @@
 import React from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { Card, Slider, Button } from '../components/ui';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import dynamic from 'next/dynamic';
+
+const PortfolioChart = dynamic(() => import('../components/charts/PortfolioChart'), { ssr: false });
 import { PieChart as PieIcon, Award, Sparkles, Scale, Info, CheckCircle2, AlertCircle } from 'lucide-react';
 import { PortfolioAllocation as PortfolioAllocType } from '../types';
 
@@ -208,32 +210,7 @@ export const PortfolioAllocation: React.FC = () => {
               {chartData.length === 0 ? (
                 <span className="text-xs text-text-muted">No assets selected. Adjust sliders to see breakdown.</span>
               ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(5, 8, 22, 0.95)',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        fontSize: '11px'
-                      }}
-                      formatter={(v) => `${v}%`}
-                    />
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={45}
-                      outerRadius={65}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                <PortfolioChart data={chartData} colors={COLORS} />
               )}
               {isBalanced && (
                 <div className="absolute flex flex-col items-center justify-center pointer-events-none">

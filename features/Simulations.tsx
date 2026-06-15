@@ -7,18 +7,10 @@ import {
   runMonteCarlo,
   getMarketScenarioImpact
 } from '../utils/finance';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
+import dynamic from 'next/dynamic';
+
+const SimulationPathChart = dynamic(() => import('../components/charts/SimulationPathChart'), { ssr: false });
+const SimulationDistChart = dynamic(() => import('../components/charts/SimulationDistChart'), { ssr: false });
 import { LineChart as LineIcon, AlertTriangle, ShieldCheck, HelpCircle, Sparkles, TrendingUp, Compass, Cpu, Layers } from 'lucide-react';
 
 export const Simulations: React.FC = () => {
@@ -161,42 +153,7 @@ export const Simulations: React.FC = () => {
               </div>
               
               <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={pathsChartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={10} tickLine={false} />
-                    <YAxis
-                      stroke="var(--text-muted)"
-                      fontSize={10}
-                      tickLine={false}
-                      tickFormatter={(v) => {
-                        if (v >= 10000000) return `₹${(v / 10000000).toFixed(1)}Cr`;
-                        if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`;
-                        return `₹${v / 1000}K`;
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(5, 8, 22, 0.95)',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        fontSize: '11px'
-                      }}
-                      formatter={(value: any) => [formatCurrency(value), '']}
-                    />
-                    {mcResults.runs.map((_, idx) => (
-                      <Line
-                        key={idx}
-                        type="monotone"
-                        name={`Path ${idx + 1}`}
-                        dataKey={`Path ${idx + 1}`}
-                        stroke={PATH_COLORS[idx % PATH_COLORS.length]}
-                        strokeWidth={1.5}
-                        dot={false}
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
+                <SimulationPathChart data={pathsChartData} runs={mcResults.runs} colors={PATH_COLORS} formatCurrency={formatCurrency} />
               </div>
             </Card>
 
@@ -207,29 +164,7 @@ export const Simulations: React.FC = () => {
                 Wealth Probability Distribution
               </h4>
               <div className="h-48 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={mcResults.distribution} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                    <XAxis dataKey="bin" stroke="var(--text-muted)" fontSize={9} tickLine={false} />
-                    <YAxis stroke="var(--text-muted)" fontSize={9} tickLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(5, 8, 22, 0.95)',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        fontSize: '11px'
-                      }}
-                    />
-                    <Bar dataKey="count" name="Frequency (Number of Runs)" fill="url(#colorMCBar)" radius={[4, 4, 0, 0]}>
-                      <defs>
-                        <linearGradient id="colorMCBar" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--primary-custom)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="var(--primary-custom)" stopOpacity={0.2} />
-                        </linearGradient>
-                      </defs>
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                <SimulationDistChart data={mcResults.distribution} />
               </div>
             </Card>
           </>
