@@ -22,8 +22,6 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {
-  const supabase = createClient();
-
   const setGuestCookie = (val: boolean) => {
     if (typeof window !== 'undefined') {
       if (val) {
@@ -50,7 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     initialize: async () => {
       set({ loading: true });
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await createClient().auth.getSession();
         const guestSession = typeof window !== 'undefined' && localStorage.getItem('siplytics-guest-session') === 'true';
 
         if (session) {
@@ -76,7 +74,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     login: async (email, password) => {
       set({ loading: true, error: null });
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await createClient().auth.signInWithPassword({
           email,
           password,
         });
@@ -100,7 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     signup: async (email, password, fullName) => {
       set({ loading: true, error: null });
       try {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await createClient().auth.signUp({
           email,
           password,
           options: {
@@ -133,7 +131,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     loginWithMagicLink: async (email) => {
       set({ loading: true, error: null });
       try {
-        const { error } = await supabase.auth.signInWithOtp({
+        const { error } = await createClient().auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
@@ -153,7 +151,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     loginWithGoogle: async () => {
       set({ loading: true, error: null });
       try {
-        const { error } = await supabase.auth.signInWithOAuth({
+        const { error } = await createClient().auth.signInWithOAuth({
           provider: 'google',
           options: {
             redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
@@ -183,7 +181,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
     logout: async () => {
       set({ loading: true });
       try {
-        await supabase.auth.signOut();
+        await createClient().auth.signOut();
       } catch (err) {
         console.error('Sign out failed:', err);
       } finally {
