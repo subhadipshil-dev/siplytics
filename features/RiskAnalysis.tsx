@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
-import { Card, Button, GaugeMeter } from '../components/ui';
+import { Card, Button, GaugeMeter, ProgressBar } from '../components/ui';
 import { ShieldCheck, ArrowRight, HelpCircle, Check, Award, RefreshCw, Scale } from 'lucide-react';
 import { RiskProfile } from '../types';
 
