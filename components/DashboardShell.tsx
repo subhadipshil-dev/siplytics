@@ -31,12 +31,15 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 /* ─── Theme Toggle Button ──────────────────────────────────── */
-const ThemeToggle: React.FC<{ theme: string; setTheme: (t: string) => void }> = ({ theme, setTheme }) => (
+const ThemeToggle: React.FC<{
+  theme: 'dark' | 'light' | 'system';
+  setTheme: (t: 'dark' | 'light' | 'system') => void;
+}> = ({ theme, setTheme }) => (
   <div className="flex items-center gap-1 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--card-border)]">
     {[
-      { mode: 'dark',   icon: Moon,    label: 'Dark' },
-      { mode: 'light',  icon: Sun,     label: 'Light' },
-      { mode: 'system', icon: Monitor, label: 'System' },
+      { mode: 'dark' as const,   icon: Moon,    label: 'Dark' },
+      { mode: 'light' as const,  icon: Sun,     label: 'Light' },
+      { mode: 'system' as const, icon: Monitor, label: 'System' },
     ].map(({ mode, icon: Icon, label }) => (
       <button
         key={mode}
