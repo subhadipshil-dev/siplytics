@@ -1,0 +1,108 @@
+'use client';
+
+import React from 'react';
+import { useFinanceStore } from '../store/useFinanceStore';
+import { Button } from './ui';
+import { Sun, Moon, Monitor, TrendingUp } from 'lucide-react';
+
+export const Header: React.FC = () => {
+  const { theme, setTheme, setActiveTab } = useFinanceStore();
+
+  const navLinks = [
+    { label: 'Why SIPlytics', href: '#why-siplytics' },
+    { label: 'Comparison', href: '#comparison' },
+    { label: 'Features', href: '#features' },
+    { label: 'Interactive Calc', href: '#interactive-calculator' },
+    { label: 'Methodology', href: '#methodology' },
+  ];
+
+  const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const target = document.querySelector(href);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  return (
+    <header className="w-full border-b border-[var(--card-border)] bg-[var(--background)]/60 backdrop-blur-xl sticky top-0 z-30 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Brand Logo */}
+        <button
+          onClick={() => setActiveTab('landing')}
+          className="flex items-center gap-2.5 hover:opacity-85 transition-all duration-200 cursor-pointer"
+        >
+          <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[var(--primary-custom)] to-[var(--secondary-custom)] flex items-center justify-center text-black font-black font-space text-base shadow-[var(--shadow-primary)] shrink-0">
+            S
+          </div>
+          <div className="flex flex-col text-left">
+            <span className="font-space font-bold text-sm tracking-tight text-[var(--foreground)] leading-none">
+              SIPlytics
+            </span>
+            <span className="text-[8px] text-[var(--text-subtle)] mt-0.5 tracking-wider uppercase font-mono">
+              Wealth Intelligence
+            </span>
+          </div>
+        </button>
+
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={(e) => handleScroll(e, link.href)}
+              className="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors duration-200"
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+
+        {/* Action Controls */}
+        <div className="flex items-center gap-4">
+          {/* Theme Selector */}
+          <div className="flex items-center gap-0.5 bg-[var(--card-bg)] p-1 rounded-xl border border-[var(--card-border)]">
+            {[
+              { mode: 'dark' as const, icon: Moon, label: 'Dark' },
+              { mode: 'light' as const, icon: Sun, label: 'Light' },
+              { mode: 'system' as const, icon: Monitor, label: 'System' },
+            ].map(({ mode, icon: Icon, label }) => (
+              <button
+                key={mode}
+                onClick={() => setTheme(mode)}
+                title={`${label} theme`}
+                className={`p-1.5 rounded-lg transition-all duration-200 cursor-pointer ${
+                  theme === mode
+                    ? 'bg-[var(--primary-custom)] text-black'
+                    : 'text-[var(--text-muted)] hover:text-[var(--foreground)]'
+                }`}
+              >
+                <Icon size={12} />
+              </button>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setActiveTab('dashboard')}
+            className="text-xs"
+          >
+            Open App
+          </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setActiveTab('dashboard')}
+            className="text-xs hidden sm:flex"
+            glow
+          >
+            Get Started
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+};

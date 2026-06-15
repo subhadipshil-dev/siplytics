@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { Card, Slider, Input, Select, Button, ProgressBar } from '../components/ui';
 import { Flame, ShieldAlert, Award, Landmark, Info, Calendar, Sparkles, TrendingUp } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
+
+const FireChart = dynamic(() => import('../components/charts/FireChart'), { ssr: false });
 
 export const FirePlanner: React.FC = () => {
   const { fireInputs, fireOutputs, updateFireInputs } = useFinanceStore();
@@ -208,62 +210,7 @@ export const FirePlanner: React.FC = () => {
           {/* Tab 1: Timeline Area Chart */}
           {activeTab === 'chart' && (
             <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorInvestedCorpus" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--primary-custom)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--primary-custom)" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorTargetCorpus" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--secondary-custom)" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="var(--secondary-custom)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
-                  <YAxis
-                    stroke="var(--text-muted)"
-                    fontSize={11}
-                    tickLine={false}
-                    tickFormatter={(v) => {
-                      if (v >= 10000000) return `₹${(v / 10000000).toFixed(1)}Cr`;
-                      if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`;
-                      return `₹${v / 1000}K`;
-                    }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      background: 'rgba(5, 8, 22, 0.95)',
-                      borderColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                      fontFamily: 'Space Grotesk'
-                    }}
-                    formatter={(value: any) => [formatCurrency(value), '']}
-                  />
-                  <Legend wrapperStyle={{ fontSize: '11px' }} />
-                  <Area
-                    type="monotone"
-                    name="Invested Corpus"
-                    dataKey="Invested Corpus"
-                    stroke="var(--primary-custom)"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#colorInvestedCorpus)"
-                  />
-                  <Area
-                    type="monotone"
-                    name="FIRE Target (Inflating)"
-                    dataKey="FIRE Target"
-                    stroke="var(--secondary-custom)"
-                    strokeWidth={1.5}
-                    strokeDasharray="4 4"
-                    fillOpacity={1}
-                    fill="url(#colorTargetCorpus)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+              <FireChart data={chartData} formatCurrency={formatCurrency} />
             </div>
           )}
 

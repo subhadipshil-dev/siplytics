@@ -5,7 +5,9 @@ import { useFinanceStore } from '../store/useFinanceStore';
 import { Card, Input, Select, Button, Slider, ProgressBar } from '../components/ui';
 import { GoalType } from '../types';
 import { Target, Plus, Trash2, AlertCircle, Home, Car, Heart, GraduationCap, Landmark, Plane, Flame } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
+
+const GoalChart = dynamic(() => import('../components/charts/GoalChart'), { ssr: false });
 
 const TOOLTIP_STYLE = {
   background: 'var(--background-secondary)',
@@ -185,19 +187,7 @@ export const GoalPlanner: React.FC = () => {
           <Card className="p-5">
             <h4 className="font-space font-bold text-sm text-[var(--foreground)] mb-4">Goal Gap Analysis</h4>
             <div className="h-52 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-line)" vertical={false} />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false}
-                    tickFormatter={(v) => v >= 1e7 ? `${(v / 1e7).toFixed(0)}Cr` : v >= 1e5 ? `${(v / 1e5).toFixed(0)}L` : `${v / 1000}K`}
-                  />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: any) => [fmt(v), '']} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: 'var(--text-muted)' }} />
-                  <Bar dataKey="Savings" name="Current Fund"  fill="var(--secondary-custom)" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Target"  name="Target Amount" fill="var(--primary-custom)"   radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <GoalChart data={chartData} fmt={fmt} tooltipStyle={TOOLTIP_STYLE} />
             </div>
           </Card>
         )}

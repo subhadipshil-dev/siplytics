@@ -4,7 +4,9 @@ import React, { useState } from 'react';
 import { useFinanceStore } from '../store/useFinanceStore';
 import { Card, Input, Button } from '../components/ui';
 import { calculatePortfolioMetrics } from '../utils/finance';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import dynamic from 'next/dynamic';
+
+const ReportChart = dynamic(() => import('../components/charts/ReportChart'), { ssr: false });
 import {
   FileText,
   Save,
@@ -226,32 +228,7 @@ export const Reports: React.FC = () => {
             <div className="mt-6">
               <h4 className="text-[10px] font-bold uppercase tracking-wider text-text-muted mb-3">Scenario Corpus Comparison</h4>
               <div className="h-40 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={fullChartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
-                    <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={9} tickLine={false} />
-                    <YAxis
-                      stroke="var(--text-muted)"
-                      fontSize={9}
-                      tickLine={false}
-                      tickFormatter={(v) => {
-                        if (v >= 10000000) return `₹${(v / 10000000).toFixed(0)}Cr`;
-                        if (v >= 100000) return `₹${(v / 100000).toFixed(0)}L`;
-                        return `₹${v / 1000}K`;
-                      }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: 'rgba(5, 8, 22, 0.95)',
-                        borderColor: 'rgba(255,255,255,0.1)',
-                        borderRadius: '8px',
-                        fontSize: '10px'
-                      }}
-                      formatter={(v: any) => formatCurrency(v)}
-                    />
-                    <Bar dataKey="Corpus" fill="#00E5FF" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <ReportChart data={fullChartData} formatCurrency={formatCurrency} />
               </div>
             </div>
           )}

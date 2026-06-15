@@ -5,10 +5,9 @@ import { useFinanceStore } from '../store/useFinanceStore';
 import { Card, Slider, Input, Select, Button } from '../components/ui';
 import { calculateSip } from '../utils/finance';
 import { Layers } from 'lucide-react';
-import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-} from 'recharts';
+import dynamic from 'next/dynamic';
+
+const SipChart = dynamic(() => import('../components/charts/SipChart'), { ssr: false });
 
 const TOOLTIP_STYLE = {
   background: 'var(--background-secondary)',
@@ -121,27 +120,7 @@ export const SipCalculator: React.FC = () => {
           {/* Growth Chart */}
           {tab === 'chart' && (
             <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="gInv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="var(--secondary-custom)" stopOpacity={0.22} />
-                      <stop offset="95%" stopColor="var(--secondary-custom)" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="gWlth" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="var(--primary-custom)" stopOpacity={0.28} />
-                      <stop offset="95%" stopColor="var(--primary-custom)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-line)" vertical={false} />
-                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={yAxis} />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: any) => [fmt(v), '']} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: 'var(--text-muted)' }} />
-                  <Area type="monotone" name="Total Invested" dataKey="Invested" stroke="var(--secondary-custom)" strokeWidth={2} fillOpacity={1} fill="url(#gInv)" />
-                  <Area type="monotone" name="Future Corpus"  dataKey="Corpus"   stroke="var(--primary-custom)"   strokeWidth={2} fillOpacity={1} fill="url(#gWlth)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <SipChart data={chartData} fmt={fmt} yAxisFormatter={yAxis} tooltipStyle={TOOLTIP_STYLE} />
             </div>
           )}
 
